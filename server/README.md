@@ -1,8 +1,9 @@
 # AquaGreen AI chat server
 
-A small Express server that proxies chat requests to OpenAI or Anthropic. It
-keeps your LLM API key on the server — the browser never sees it — which is
-the safe way to run the "Chat with AquaGreen AI" feature in production.
+A small Express server that proxies chat requests to OpenAI, Anthropic, or
+Google Gemini. It keeps your LLM API key on the server — the browser never
+sees it — which is the safe way to run the "Chat with AquaGreen AI" feature
+in production.
 
 ## Setup
 
@@ -13,8 +14,9 @@ cp .env.example .env
 ```
 
 Edit `.env` and set:
-- `CHAT_PROVIDER` to `openai` or `anthropic`
-- The matching `OPENAI_API_KEY` or `ANTHROPIC_API_KEY`
+- `CHAT_PROVIDER` to `openai`, `anthropic`, or `gemini`
+- The matching key: `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, or `GEMINI_API_KEY`
+  (get a Gemini key from https://aistudio.google.com/apikey)
 - `ALLOWED_ORIGIN` to the origin your site is served from (or `*` while testing locally)
 
 ## Run

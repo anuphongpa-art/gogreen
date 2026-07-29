@@ -10,6 +10,8 @@ const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
 const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4o-mini';
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || '';
 const ANTHROPIC_MODEL = process.env.ANTHROPIC_MODEL || 'claude-3-5-haiku-20241022';
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '*';
 
 const MAX_MESSAGES = 30;
@@ -95,6 +97,26 @@ async function callAnthropic(systemPrompt, messages) {
   return data.content?.[0]?.text || '(no response)';
 }
 
+async function callGemini(systemPrompt, messages) {
+  if (!GEMINI_API_KEY) throw new Error('Server is missing GEMINI_API_KEY.');
+
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      system_instruction: { parts: [{ text: systemPrompt }] },
+      contents: messages.map(m => ({
+        role: m.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: m.content }],
+      })),
+    }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error?.message || `Gemini request failed (HTTP ${res.status}).`);
+  return data.candidates?.[0]?.content?.parts?.[0]?.text || '(no response)';
+}
+
 app.get('/health', (req, res) => {
   res.json({ ok: true, provider: PROVIDER });
 });
@@ -108,9 +130,10 @@ app.post('/api/chat', chatLimiter, async (req, res) => {
   const { systemPrompt, messages } = req.body;
 
   try {
-    const reply = PROVIDER === 'anthropic'
-      ? await callAnthropic(systemPrompt, messages)
-      : await callOpenAI(systemPrompt, messages);
+    let reply;
+    if (PROVIDER === 'anthropic') reply = await callAnthropic(systemPrompt, messages);
+    else if (PROVIDER === 'gemini') reply = await callGemini(systemPrompt, messages);
+    else reply = await callOpenAI(systemPrompt, messages);
     res.json({ reply });
   } catch (err) {
     console.error('[chat] provider error:', err.message);
