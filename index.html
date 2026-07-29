@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Aqua AI | Green Score for Shrimp Farms</title>
+<title>AquaGreen AI | Green Score for Shrimp Farms</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -16,9 +16,9 @@
   a { text-decoration: none; color: inherit; }
 
   :root {
-    --cyan:   #06b6d4;
-    --cyan-d: #0891b2;
-    --green:  #10b981;
+    --cyan:   #22c55e;
+    --cyan-d: #16a34a;
+    --green:  #059669;
     --amber:  #f59e0b;
     --red:    #ef4444;
     --navy:   #ffffff;
@@ -42,7 +42,7 @@
     font-size: .75rem; font-weight: 600; letter-spacing: .08em;
     text-transform: uppercase; padding: 4px 14px;
     border-radius: 100px; border: 1px solid var(--border);
-    background: rgba(6,182,212,.1); color: var(--cyan);
+    background: rgba(34,197,94,.1); color: var(--cyan);
     margin-bottom: 16px;
   }
   .section-title { font-size: clamp(1.5rem, 3.5vw, 2.25rem); font-weight: 800; margin-bottom: 12px; }
@@ -60,7 +60,7 @@
   }
   .btn-primary {
     background: linear-gradient(135deg, var(--cyan), var(--cyan-d));
-    color: #fff; box-shadow: 0 4px 20px rgba(6,182,212,.4);
+    color: #fff; box-shadow: 0 4px 20px rgba(34,197,94,.4);
   }
   .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
 
@@ -82,7 +82,7 @@
 
   /* Hero */
   #hero { padding: 56px 0 40px; text-align: center;
-    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(6,182,212,.15) 0%, transparent 70%);
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(34,197,94,.15) 0%, transparent 70%);
   }
   .hero-title { font-size: clamp(2rem, 5vw, 3rem); font-weight: 900; line-height: 1.1; margin-bottom: 18px; }
   .hero-desc { font-size: 1.05rem; color: var(--muted); max-width: 600px; margin: 0 auto 32px; line-height: 1.7; }
@@ -91,7 +91,7 @@
   .steps-strip { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
   .step-chip {
     display: flex; align-items: center; gap: 8px;
-    background: rgba(6,182,212,.08); border: 1px solid var(--border);
+    background: rgba(34,197,94,.08); border: 1px solid var(--border);
     border-radius: 100px; padding: 8px 18px; font-size: .82rem; color: var(--muted); font-weight: 600;
   }
   .step-chip .n {
@@ -112,7 +112,7 @@
     padding: 32px 16px; cursor: pointer; transition: all .2s; flex: 1;
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
   }
-  .file-drop:hover { border-color: var(--cyan); background: rgba(6,182,212,.05); }
+  .file-drop:hover { border-color: var(--cyan); background: rgba(34,197,94,.05); }
   .file-drop .icon { font-size: 2.2rem; }
   .file-drop .fname { font-size: .82rem; color: var(--cyan); font-weight: 600; margin-top: 6px; }
   #file-input { display: none; }
@@ -130,14 +130,14 @@
     border: 1px solid #e5e9ef; border-radius: 10px;
     color: #1a2333; font-size: .95rem; outline: none; transition: border-color .2s;
   }
-  .input-group input:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(6,182,212,.12); }
+  .input-group input:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(34,197,94,.12); }
   .input-group .unit { font-size: .74rem; color: var(--muted); margin-top: 4px; }
   .calc-btn {
     width: 100%; margin-top: 8px;
     background: linear-gradient(135deg, var(--cyan), var(--cyan-d));
     color: #fff; font-size: 1rem; font-weight: 700; padding: 15px;
     border-radius: 12px; border: none; cursor: pointer; transition: all .2s;
-    box-shadow: 0 4px 20px rgba(6,182,212,.3);
+    box-shadow: 0 4px 20px rgba(34,197,94,.3);
   }
   .calc-btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
 
@@ -197,7 +197,7 @@
   .passport-card p { font-size: .85rem; color: var(--muted); line-height: 1.6; }
   .passport-btn {
     width: 100%; padding: 14px;
-    background: linear-gradient(135deg, var(--green), #059669);
+    background: linear-gradient(135deg, var(--green), #047857);
     color: #fff; font-weight: 700; font-size: .95rem;
     border-radius: 12px; border: none; cursor: pointer; transition: all .2s;
     display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -285,7 +285,7 @@
     background: var(--navy-2); border: 1px solid var(--border);
     border-radius: 20px; max-width: 480px; width: 100%; overflow: hidden;
   }
-  .modal-header { background: linear-gradient(135deg, var(--cyan-d), #0e4f6b); padding: 26px 30px; }
+  .modal-header { background: linear-gradient(135deg, var(--cyan-d), #065f46); padding: 26px 30px; }
   .modal-header h2 { font-size: 1.2rem; font-weight: 800; color: #fff; }
   .modal-header p { font-size: .82rem; color: rgba(255,255,255,.7); margin-top: 4px; }
   .modal-body { padding: 26px 30px; }
@@ -293,7 +293,7 @@
   .passport-field { margin-bottom: 12px; }
   .passport-field .pf-label { font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
   .passport-field .pf-val { font-size: .92rem; font-weight: 600; }
-  .passport-score-big { text-align: center; padding: 14px 18px; background: rgba(6,182,212,.08); border: 1px solid var(--border); border-radius: 12px; }
+  .passport-score-big { text-align: center; padding: 14px 18px; background: rgba(34,197,94,.08); border: 1px solid var(--border); border-radius: 12px; }
   .passport-score-big .ps-num {
     font-size: 2.2rem; font-weight: 900;
     background: linear-gradient(135deg, var(--cyan), var(--green));
@@ -315,7 +315,7 @@
   .btn-close-modal:hover { background: #f7f9fb; }
   .btn-download {
     flex: 1; padding: 12px; border-radius: 10px;
-    background: linear-gradient(135deg, var(--green), #059669);
+    background: linear-gradient(135deg, var(--green), #047857);
     color: #fff; font-weight: 700; border: none; cursor: pointer; transition: all .2s;
   }
   .btn-download:hover { filter: brightness(1.08); }
@@ -332,7 +332,7 @@
   <div class="container nav-inner">
     <a href="#hero" class="nav-logo">
       <div class="logo-icon">🦐</div>
-      <span>Aqua <span class="gradient-text">AI</span></span>
+      <span>AquaGreen <span class="gradient-text">AI</span></span>
     </a>
     <ul class="nav-links">
       <li><a href="#upload">Upload Data</a></li>
@@ -508,7 +508,7 @@
 
     <div class="card chatbot-card">
       <div class="chatbot-header">
-        <h4>💬 Chat with Aqua AI</h4>
+        <h4>💬 Chat with AquaGreen AI</h4>
         <button class="chat-settings-btn" onclick="toggleChatSettings()" title="AI API settings">⚙️</button>
       </div>
 
@@ -545,7 +545,7 @@
 
 <footer>
   <div class="container">
-    <p>🦐 Aqua AI — Upload data, get your Green Score, and earn your Green Passport.</p>
+    <p>🦐 AquaGreen AI — Upload data, get your Green Score, and earn your Green Passport.</p>
   </div>
 </footer>
 
@@ -554,7 +554,7 @@
   <div class="modal-box">
     <div class="modal-header">
       <h2>🛂 Green Passport</h2>
-      <p>Aqua AI · Farm Sustainability Certificate</p>
+      <p>AquaGreen AI · Farm Sustainability Certificate</p>
     </div>
     <div class="modal-body">
       <div class="passport-grid">
@@ -819,7 +819,7 @@ function openPassport() {
   document.getElementById('pp-grade').textContent     = `Grade ${lastGrade}`;
   document.getElementById('pp-score').textContent     = `${lastScore} / 100 points`;
   document.getElementById('pp-score-big').textContent = lastScore;
-  document.getElementById('pp-link').textContent      = `https://aqua-ai.app/passport/${passportId}`;
+  document.getElementById('pp-link').textContent      = `https://aquagreen-ai.app/passport/${passportId}`;
   generateQR(document.getElementById('qr-grid'));
   document.getElementById('passport-modal').classList.add('open');
 }
@@ -867,7 +867,7 @@ function saveChatSettings() {
 function buildChatSystemPrompt(tips) {
   const d = lastData;
   const tipsText = (tips || []).map(t => '- ' + t.replace(/<[^>]+>/g, '')).join('\n');
-  return `You are "Aqua AI Eco-Helper", a friendly sustainability advisor chatbot inside the Aqua AI app for shrimp farmers.
+  return `You are "AquaGreen AI Eco-Helper", a friendly sustainability advisor chatbot inside the AquaGreen AI app for shrimp farmers.
 
 The farmer just calculated their latest Green Score:
 - Total Score: ${lastScore}/100 (Grade ${lastGrade})
