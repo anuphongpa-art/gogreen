@@ -206,6 +206,70 @@
   .passport-btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
   .passport-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
 
+  /* Chatbot */
+  .chatbot-card { margin-top: 28px; }
+  .chatbot-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .chatbot-header h4 { font-size: .9rem; font-weight: 700; color: var(--cyan-d); display: flex; align-items: center; gap: 6px; }
+  .chat-settings-btn {
+    border: 1px solid var(--border); background: #fff; border-radius: 8px;
+    width: 32px; height: 32px; cursor: pointer; font-size: .95rem; transition: all .2s;
+  }
+  .chat-settings-btn:hover { background: #f7f9fb; }
+  .chat-settings {
+    background: #f7f9fb; border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px 16px; margin-bottom: 14px;
+  }
+  .chat-settings-note { font-size: .76rem; color: var(--muted); line-height: 1.5; margin-bottom: 10px; }
+  .chat-settings-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chat-settings-row select, .chat-settings-row input {
+    padding: 9px 12px; border-radius: 8px; border: 1px solid #e5e9ef;
+    background: #fff; color: #1a2333; font-size: .85rem; outline: none;
+  }
+  .chat-settings-row select { flex: 0 0 auto; }
+  .chat-settings-row input { flex: 1; min-width: 160px; }
+  .chat-settings-row input:focus, .chat-settings-row select:focus { border-color: var(--cyan); }
+  .btn-save-key {
+    padding: 9px 16px; border-radius: 8px; border: none; cursor: pointer;
+    background: var(--cyan-d); color: #fff; font-weight: 600; font-size: .85rem; transition: all .2s;
+  }
+  .btn-save-key:hover { filter: brightness(1.1); }
+  .chat-key-status { font-size: .74rem; color: var(--green); margin-top: 8px; display: none; }
+  .chat-key-status.show { display: block; }
+  .chat-window {
+    max-height: 320px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;
+    padding: 4px 2px 8px;
+  }
+  .chat-msg { display: flex; }
+  .chat-msg-user { justify-content: flex-end; }
+  .chat-msg-bot { justify-content: flex-start; }
+  .chat-bubble {
+    max-width: 80%; padding: 10px 14px; border-radius: 14px;
+    font-size: .87rem; line-height: 1.55; white-space: pre-wrap;
+  }
+  .chat-msg-bot .chat-bubble { background: #f7f9fb; border: 1px solid var(--border); color: #1a2333; border-bottom-left-radius: 4px; }
+  .chat-msg-user .chat-bubble { background: linear-gradient(135deg, var(--cyan), var(--cyan-d)); color: #fff; border-bottom-right-radius: 4px; }
+  .chat-typing-dots span {
+    display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--muted); margin-right: 3px; animation: chat-blink 1.2s infinite;
+  }
+  .chat-typing-dots span:nth-child(2) { animation-delay: .2s; }
+  .chat-typing-dots span:nth-child(3) { animation-delay: .4s; }
+  @keyframes chat-blink { 0%, 80%, 100% { opacity: .25; } 40% { opacity: 1; } }
+  .chat-input-row { display: flex; gap: 8px; margin-top: 14px; border-top: 1px solid var(--border); padding-top: 14px; }
+  .chat-input-row input {
+    flex: 1; padding: 11px 14px; border-radius: 10px; border: 1px solid #e5e9ef;
+    background: #f7f9fb; color: #1a2333; font-size: .9rem; outline: none; transition: border-color .2s;
+  }
+  .chat-input-row input:focus { border-color: var(--cyan); }
+  .chat-input-row input:disabled { opacity: .6; cursor: not-allowed; }
+  .chat-send-btn {
+    width: 44px; height: 44px; flex-shrink: 0; border-radius: 10px; border: none;
+    background: linear-gradient(135deg, var(--cyan), var(--cyan-d)); color: #fff;
+    font-size: 1.1rem; cursor: pointer; transition: all .2s;
+  }
+  .chat-send-btn:hover { filter: brightness(1.1); }
+  .chat-send-btn:disabled { opacity: .4; cursor: not-allowed; }
+
   /* Footer */
   footer { background: var(--navy-3); border-top: 1px solid var(--border); padding: 28px 0; text-align: center; }
   footer p { font-size: .82rem; color: var(--muted); }
@@ -441,6 +505,41 @@
         </button>
       </div>
     </div>
+
+    <div class="card chatbot-card">
+      <div class="chatbot-header">
+        <h4>💬 Chat with Aqua AI</h4>
+        <button class="chat-settings-btn" onclick="toggleChatSettings()" title="AI API settings">⚙️</button>
+      </div>
+
+      <div class="chat-settings" id="chat-settings" style="display:none">
+        <p class="chat-settings-note">
+          🔒 This chat calls the AI provider directly from your browser using your own API key.
+          The key is saved only in this browser's local storage and is never sent anywhere except the provider you choose below —
+          don't paste a shared/production key on a public computer.
+        </p>
+        <div class="chat-settings-row">
+          <select id="chat-provider">
+            <option value="openai">OpenAI · gpt-4o-mini</option>
+            <option value="anthropic">Anthropic · Claude Haiku</option>
+          </select>
+          <input type="password" id="chat-api-key" placeholder="Paste your API key" />
+          <button class="btn-save-key" onclick="saveChatSettings()">Save</button>
+        </div>
+        <div class="chat-key-status" id="chat-key-status">✓ API key saved in this browser.</div>
+      </div>
+
+      <div class="chat-window" id="chat-window">
+        <div class="chat-msg chat-msg-bot">
+          <div class="chat-bubble">👋 Calculate your Green Score above first — I'll review your numbers and give you a personalized assessment, then you can ask me follow-up questions.</div>
+        </div>
+      </div>
+
+      <div class="chat-input-row">
+        <input type="text" id="chat-input" placeholder="Calculate your score first…" disabled onkeydown="if(event.key==='Enter') sendChatMessage()" />
+        <button class="chat-send-btn" id="chat-send-btn" onclick="sendChatMessage()" disabled>➤</button>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -642,6 +741,8 @@ function calculateScore() {
     passportBtn.style.boxShadow = '';
   }
 
+  primeChatbot(tips);
+
   document.getElementById('score').scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -728,6 +829,202 @@ function closePassport() {
 document.getElementById('passport-modal').addEventListener('click', function(e) {
   if (e.target === this) closePassport();
 });
+
+/* ── AI Chatbot ─────────────────────────────────────────── */
+let chatSystemPrompt = '';
+let chatHistory = [];
+let chatBusy = false;
+
+function loadChatSettings() {
+  const provider = localStorage.getItem('aquaai_chat_provider') || 'openai';
+  const key      = localStorage.getItem('aquaai_chat_key') || '';
+  document.getElementById('chat-provider').value = provider;
+  document.getElementById('chat-api-key').value  = key;
+  document.getElementById('chat-key-status').classList.toggle('show', !!key);
+}
+
+function getChatSettings() {
+  return {
+    provider: localStorage.getItem('aquaai_chat_provider') || 'openai',
+    key: localStorage.getItem('aquaai_chat_key') || '',
+  };
+}
+
+function toggleChatSettings() {
+  const panel = document.getElementById('chat-settings');
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+
+function saveChatSettings() {
+  const provider = document.getElementById('chat-provider').value;
+  const key      = document.getElementById('chat-api-key').value.trim();
+  localStorage.setItem('aquaai_chat_provider', provider);
+  localStorage.setItem('aquaai_chat_key', key);
+  document.getElementById('chat-key-status').classList.toggle('show', !!key);
+  document.getElementById('chat-settings').style.display = 'none';
+}
+
+function buildChatSystemPrompt(tips) {
+  const d = lastData;
+  const tipsText = (tips || []).map(t => '- ' + t.replace(/<[^>]+>/g, '')).join('\n');
+  return `You are "Aqua AI Eco-Helper", a friendly sustainability advisor chatbot inside the Aqua AI app for shrimp farmers.
+
+The farmer just calculated their latest Green Score:
+- Total Score: ${lastScore}/100 (Grade ${lastGrade})
+- Feed Efficiency (FCR = feed ÷ harvest): ${d.fcr.toFixed(2)} → ${d.fcrScore}/40 pts
+- Energy Efficiency: ${Math.round(d.energyIntensity).toLocaleString()} kWh/ton harvested → ${d.energyScore}/30 pts
+- Water Management: ${d.waterRatio.toFixed(1)} m³ water changed per ton harvested → ${d.waterScore}/30 pts
+
+Scoring rules (for your reference, don't just recite them):
+FCR: ≤1.20=40pts, 1.21-1.40=28pts, 1.41-1.60=16pts, >1.60=0pts.
+Energy: ≤2500 kWh/ton=30pts, 2501-3500=18pts, >3500=6pts.
+Water: ≤80 m³/ton=30pts, 81-200=18pts, >200=6pts.
+Grade: ≥80=A (Green Passport eligible, min score 60 required to generate one), 60-79=B, <60=C.
+
+Auto-generated tips already shown to the farmer:
+${tipsText || '(none — farm is already efficient across all metrics)'}
+
+Your job: give a short, encouraging initial assessment (a few sentences) that references their actual numbers, then be ready to answer follow-up questions about how to improve feed, energy, or water management, what the Green Passport is for, or how their numbers compare to the thresholds. Keep replies concise (under 120 words) unless asked for more detail. Reply in whatever language the farmer writes in (support Thai and English equally well). If asked about something unrelated to farm sustainability/scoring, politely steer the conversation back.`;
+}
+
+function primeChatbot(tips) {
+  chatSystemPrompt = buildChatSystemPrompt(tips);
+  chatHistory = [];
+  document.getElementById('chat-window').innerHTML = '';
+  document.getElementById('chat-input').disabled = false;
+  document.getElementById('chat-input').placeholder = 'Ask a follow-up question…';
+  document.getElementById('chat-send-btn').disabled = false;
+
+  chatHistory.push({
+    role: 'user',
+    content: 'Please give me a short, friendly assessment of my farm\'s sustainability data and the top 1-2 things I should prioritize next cycle.',
+  });
+  requestAssistantReply();
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function formatChatText(text) {
+  return escapeHtml(text)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+}
+
+function appendChatMessage(role, text, id) {
+  const win = document.getElementById('chat-window');
+  const row = document.createElement('div');
+  row.className = `chat-msg chat-msg-${role}`;
+  if (id) row.id = id;
+  const bubble = document.createElement('div');
+  bubble.className = 'chat-bubble';
+  bubble.innerHTML = formatChatText(text);
+  row.appendChild(bubble);
+  win.appendChild(row);
+  win.scrollTop = win.scrollHeight;
+  return row;
+}
+
+function showTyping() {
+  const win = document.getElementById('chat-window');
+  const row = document.createElement('div');
+  row.className = 'chat-msg chat-msg-bot';
+  row.id = 'chat-typing';
+  row.innerHTML = '<div class="chat-bubble chat-typing-dots"><span></span><span></span><span></span></div>';
+  win.appendChild(row);
+  win.scrollTop = win.scrollHeight;
+}
+
+function removeTyping() {
+  const el = document.getElementById('chat-typing');
+  if (el) el.remove();
+}
+
+function sendChatMessage() {
+  if (chatBusy) return;
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+
+  const settings = getChatSettings();
+  if (!settings.key) {
+    appendChatMessage('bot', '⚠️ Please add your AI API key first — tap the ⚙️ icon above to paste your OpenAI or Anthropic key.');
+    document.getElementById('chat-settings').style.display = 'block';
+    return;
+  }
+
+  appendChatMessage('user', text);
+  chatHistory.push({ role: 'user', content: text });
+  input.value = '';
+  requestAssistantReply();
+}
+
+async function requestAssistantReply() {
+  const settings = getChatSettings();
+  if (!settings.key) {
+    appendChatMessage('bot', '⚠️ Please add your AI API key first — tap the ⚙️ icon above to paste your OpenAI or Anthropic key.');
+    document.getElementById('chat-settings').style.display = 'block';
+    return;
+  }
+
+  chatBusy = true;
+  document.getElementById('chat-send-btn').disabled = true;
+  showTyping();
+
+  try {
+    let replyText;
+    if (settings.provider === 'anthropic') {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-api-key': settings.key,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true',
+        },
+        body: JSON.stringify({
+          model: 'claude-3-5-haiku-20241022',
+          max_tokens: 500,
+          system: chatSystemPrompt,
+          messages: chatHistory,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error?.message || `HTTP ${res.status}`);
+      replyText = data.content?.[0]?.text || '(no response)';
+    } else {
+      const res = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'Authorization': 'Bearer ' + settings.key,
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          temperature: 0.6,
+          messages: [{ role: 'system', content: chatSystemPrompt }, ...chatHistory],
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error?.message || `HTTP ${res.status}`);
+      replyText = data.choices?.[0]?.message?.content || '(no response)';
+    }
+    removeTyping();
+    chatHistory.push({ role: 'assistant', content: replyText });
+    appendChatMessage('bot', replyText);
+  } catch (err) {
+    removeTyping();
+    appendChatMessage('bot', `⚠️ Couldn't reach the AI (${err.message}). Check your API key, provider selection, and internet connection.`);
+  } finally {
+    chatBusy = false;
+    document.getElementById('chat-send-btn').disabled = false;
+  }
+}
+
+loadChatSettings();
 </script>
 
 </body>
