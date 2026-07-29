@@ -1,1052 +1,374 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AquaValue AI | Turning Farm Data into Green Scores</title>
-  <style>
-    /* ── Reset & Base ─────────────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; font-size: 16px; }
-    body {
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: #080f1e;
-      color: #e2e8f0;
-      overflow-x: hidden;
-    }
-    img { max-width: 100%; display: block; }
-    a { text-decoration: none; color: inherit; }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aqua AI | Green Score for Shrimp Farms</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; font-size: 16px; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #ffffff;
+    color: #1a2333;
+  }
+  a { text-decoration: none; color: inherit; }
 
-    /* ── Custom Properties ────────────────────────────────── */
-    :root {
-      --cyan:   #06b6d4;
-      --cyan-d: #0891b2;
-      --green:  #10b981;
-      --amber:  #f59e0b;
-      --red:    #ef4444;
-      --navy:   #080f1e;
-      --navy-2: #0d1a2e;
-      --navy-3: #112240;
-      --card:   rgba(17,34,64,.75);
-      --border: rgba(6,182,212,.18);
-      --text:   #e2e8f0;
-      --muted:  #94a3b8;
-      --radius: 16px;
-      --shadow: 0 8px 32px rgba(0,0,0,.45);
-    }
+  :root {
+    --cyan:   #06b6d4;
+    --cyan-d: #0891b2;
+    --green:  #10b981;
+    --amber:  #f59e0b;
+    --red:    #ef4444;
+    --navy:   #ffffff;
+    --navy-2: #f7f9fb;
+    --navy-3: #f0f3f7;
+    --card:   #ffffff;
+    --border: #e5e9ef;
+    --muted:  #6b7686;
+    --radius: 16px;
+  }
 
-    /* ── Utilities ────────────────────────────────────────── */
-    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-    .section { padding: 96px 0; }
-    .section-sm { padding: 64px 0; }
-    .text-center { text-align: center; }
-    .gradient-text {
-      background: linear-gradient(135deg, var(--cyan), var(--green));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .badge {
-      display: inline-flex; align-items: center; gap: 6px;
-      font-size: .75rem; font-weight: 600; letter-spacing: .08em;
-      text-transform: uppercase; padding: 4px 14px;
-      border-radius: 100px; border: 1px solid var(--border);
-      background: rgba(6,182,212,.1); color: var(--cyan);
-      margin-bottom: 16px;
-    }
-    .section-title {
-      font-size: clamp(1.75rem, 4vw, 2.75rem);
-      font-weight: 800; line-height: 1.15;
-      margin-bottom: 16px;
-    }
-    .section-sub {
-      font-size: 1.1rem; color: var(--muted);
-      max-width: 640px; line-height: 1.7;
-    }
-    .section-sub.center { margin: 0 auto; }
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
-    .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 28px; }
-    .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 24px; }
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 32px;
-      backdrop-filter: blur(16px);
-      transition: transform .25s, box-shadow .25s;
-    }
-    .card:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(6,182,212,.12); }
-    .btn {
-      display: inline-flex; align-items: center; gap: 8px;
-      font-size: .95rem; font-weight: 600; padding: 13px 28px;
-      border-radius: 10px; border: none; cursor: pointer;
-      transition: all .2s;
-    }
-    .btn-primary {
-      background: linear-gradient(135deg, var(--cyan), var(--cyan-d));
-      color: #fff;
-      box-shadow: 0 4px 20px rgba(6,182,212,.4);
-    }
-    .btn-primary:hover { filter: brightness(1.1); box-shadow: 0 6px 28px rgba(6,182,212,.55); transform: translateY(-1px); }
-    .btn-outline {
-      background: transparent; color: var(--cyan);
-      border: 1.5px solid var(--cyan);
-    }
-    .btn-outline:hover { background: rgba(6,182,212,.1); }
+  .container { max-width: 1000px; margin: 0 auto; padding: 0 24px; }
+  .section { padding: 72px 0; }
+  .text-center { text-align: center; }
+  .gradient-text {
+    background: linear-gradient(135deg, var(--cyan), var(--green));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: .75rem; font-weight: 600; letter-spacing: .08em;
+    text-transform: uppercase; padding: 4px 14px;
+    border-radius: 100px; border: 1px solid var(--border);
+    background: rgba(6,182,212,.1); color: var(--cyan);
+    margin-bottom: 16px;
+  }
+  .section-title { font-size: clamp(1.5rem, 3.5vw, 2.25rem); font-weight: 800; margin-bottom: 12px; }
+  .section-sub { font-size: 1rem; color: var(--muted); max-width: 620px; line-height: 1.7; }
+  .section-sub.center { margin: 0 auto; }
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 32px;
+    box-shadow: 0 1px 3px rgba(16,24,40,.04);
+  }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: .95rem; font-weight: 600; padding: 13px 28px;
+    border-radius: 10px; border: none; cursor: pointer; transition: all .2s;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--cyan), var(--cyan-d));
+    color: #fff; box-shadow: 0 4px 20px rgba(6,182,212,.4);
+  }
+  .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
 
-    /* ── Scrollbar ────────────────────────────────────────── */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: var(--navy); }
-    ::-webkit-scrollbar-thumb { background: var(--cyan-d); border-radius: 3px; }
+  /* Navbar */
+  #navbar {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(255,255,255,.92); backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border); padding: 14px 0;
+  }
+  .nav-inner { display: flex; align-items: center; justify-content: space-between; }
+  .nav-logo { display: flex; align-items: center; gap: 10px; font-size: 1.15rem; font-weight: 800; }
+  .nav-logo .logo-icon {
+    width: 36px; height: 36px; background: linear-gradient(135deg, var(--cyan), var(--green));
+    border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+  }
+  .nav-links { display: flex; align-items: center; gap: 24px; list-style: none; }
+  .nav-links a { font-size: .88rem; color: var(--muted); font-weight: 500; }
+  .nav-links a:hover { color: var(--text); }
 
-    /* ── Navbar ───────────────────────────────────────────── */
-    #navbar {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      padding: 16px 0;
-      transition: background .3s, box-shadow .3s;
-    }
-    #navbar.scrolled {
-      background: rgba(8,15,30,.9);
-      backdrop-filter: blur(20px);
-      box-shadow: 0 1px 0 var(--border);
-    }
-    .nav-inner {
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .nav-logo {
-      display: flex; align-items: center; gap: 10px;
-      font-size: 1.2rem; font-weight: 800;
-    }
-    .nav-logo .logo-icon {
-      width: 38px; height: 38px;
-      background: linear-gradient(135deg, var(--cyan), var(--green));
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.2rem;
-    }
-    .nav-links {
-      display: flex; align-items: center; gap: 32px;
-      list-style: none;
-    }
-    .nav-links a {
-      font-size: .9rem; color: var(--muted); font-weight: 500;
-      transition: color .2s;
-    }
-    .nav-links a:hover { color: var(--text); }
-    .nav-cta { display: flex; align-items: center; gap: 12px; }
-    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
-    .hamburger span { display: block; width: 24px; height: 2px; background: var(--text); border-radius: 2px; transition: all .3s; }
+  /* Hero */
+  #hero { padding: 56px 0 40px; text-align: center;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(6,182,212,.15) 0%, transparent 70%);
+  }
+  .hero-title { font-size: clamp(2rem, 5vw, 3rem); font-weight: 900; line-height: 1.1; margin-bottom: 18px; }
+  .hero-desc { font-size: 1.05rem; color: var(--muted); max-width: 600px; margin: 0 auto 32px; line-height: 1.7; }
 
-    /* ── Hero ─────────────────────────────────────────────── */
-    #hero {
-      position: relative; min-height: 100vh;
-      display: flex; align-items: center;
-      overflow: hidden;
-      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(6,182,212,.15) 0%, transparent 70%),
-                  linear-gradient(180deg, #080f1e 0%, #0a1628 100%);
-    }
-    .hero-content { position: relative; z-index: 2; padding-top: 100px; }
-    .hero-label {
-      display: inline-flex; align-items: center; gap: 8px;
-      font-size: .8rem; font-weight: 600; text-transform: uppercase;
-      letter-spacing: .1em; color: var(--cyan);
-      background: rgba(6,182,212,.12); border: 1px solid rgba(6,182,212,.3);
-      padding: 6px 16px; border-radius: 100px; margin-bottom: 24px;
-    }
-    .hero-label span { width: 6px; height: 6px; background: var(--cyan); border-radius: 50%; animation: pulse-dot 1.5s infinite; }
-    .hero-title {
-      font-size: clamp(2.5rem, 6vw, 4.5rem);
-      font-weight: 900; line-height: 1.08; letter-spacing: -.02em;
-      margin-bottom: 24px;
-    }
-    .hero-desc {
-      font-size: 1.15rem; color: var(--muted);
-      max-width: 580px; line-height: 1.75; margin-bottom: 40px;
-    }
-    .hero-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 56px; }
-    .hero-stats {
-      display: flex; flex-wrap: wrap; gap: 32px;
-    }
-    .hero-stat strong {
-      display: block; font-size: 1.8rem; font-weight: 800;
-      background: linear-gradient(135deg, var(--cyan), var(--green));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    }
-    .hero-stat span { font-size: .85rem; color: var(--muted); }
+  /* Steps strip */
+  .steps-strip { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+  .step-chip {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(6,182,212,.08); border: 1px solid var(--border);
+    border-radius: 100px; padding: 8px 18px; font-size: .82rem; color: var(--muted); font-weight: 600;
+  }
+  .step-chip .n {
+    width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--cyan), var(--green));
+    color: #fff; font-size: .75rem; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+  }
 
-    /* Bubbles */
-    #bubbles { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
-    .bubble {
-      position: absolute; border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, rgba(6,182,212,.25), transparent);
-      border: 1px solid rgba(6,182,212,.15);
-      animation: float-up linear infinite;
-    }
+  /* Upload section */
+  #upload { background: var(--navy-2); }
+  .upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 40px; align-items: stretch; }
+  .upload-box { text-align: center; display: flex; flex-direction: column; }
+  .upload-box h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; }
+  .upload-box p.hint { font-size: .82rem; color: var(--muted); margin-bottom: 18px; }
+  .file-drop {
+    border: 2px dashed var(--border); border-radius: 12px;
+    padding: 32px 16px; cursor: pointer; transition: all .2s; flex: 1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+  }
+  .file-drop:hover { border-color: var(--cyan); background: rgba(6,182,212,.05); }
+  .file-drop .icon { font-size: 2.2rem; }
+  .file-drop .fname { font-size: .82rem; color: var(--cyan); font-weight: 600; margin-top: 6px; }
+  #file-input { display: none; }
+  .divider-or {
+    display: flex; align-items: center; gap: 12px; color: var(--muted);
+    font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; margin: 4px 0;
+  }
+  .input-group { margin-bottom: 16px; text-align: left; }
+  .input-group label {
+    display: block; font-size: .8rem; font-weight: 600; color: var(--muted);
+    margin-bottom: 6px; text-transform: uppercase; letter-spacing: .04em;
+  }
+  .input-group input {
+    width: 100%; padding: 12px 16px; background: #f7f9fb;
+    border: 1px solid #e5e9ef; border-radius: 10px;
+    color: #1a2333; font-size: .95rem; outline: none; transition: border-color .2s;
+  }
+  .input-group input:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(6,182,212,.12); }
+  .input-group .unit { font-size: .74rem; color: var(--muted); margin-top: 4px; }
+  .calc-btn {
+    width: 100%; margin-top: 8px;
+    background: linear-gradient(135deg, var(--cyan), var(--cyan-d));
+    color: #fff; font-size: 1rem; font-weight: 700; padding: 15px;
+    border-radius: 12px; border: none; cursor: pointer; transition: all .2s;
+    box-shadow: 0 4px 20px rgba(6,182,212,.3);
+  }
+  .calc-btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
 
-    /* Wave */
-    .wave-divider { position: absolute; bottom: -2px; left: 0; right: 0; }
-    .wave-divider svg { display: block; width: 100%; }
+  /* Score section */
+  #score { background: var(--navy); }
+  .calc-empty {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 240px; color: var(--muted); gap: 10px; margin-top: 40px;
+  }
+  .calc-empty .empty-icon { font-size: 2.6rem; opacity: .4; }
+  #results-content { display: none; margin-top: 40px; }
+  .score-layout { display: grid; grid-template-columns: 320px 1fr; gap: 28px; }
+  .gauge-wrap { display: flex; justify-content: center; margin-bottom: 20px; }
+  .gauge-container { position: relative; width: 160px; height: 160px; }
+  .gauge-svg { transform: rotate(-90deg); }
+  .gauge-track { fill: none; stroke: #eef1f5; stroke-width: 14; }
+  .gauge-fill {
+    fill: none; stroke-width: 14; stroke-linecap: round;
+    stroke-dasharray: 339.292; stroke-dashoffset: 339.292;
+    transition: stroke-dashoffset 1s ease, stroke .5s;
+  }
+  .gauge-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .gauge-score {
+    font-size: 2.4rem; font-weight: 900;
+    background: linear-gradient(135deg, var(--cyan), var(--green));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .gauge-label { font-size: .74rem; color: var(--muted); }
+  .grade-display { text-align: center; padding: 18px; border-radius: 14px; border: 1px solid var(--border); }
+  .grade-letter { font-size: 3rem; font-weight: 900; line-height: 1; }
+  .grade-a .grade-letter { color: var(--green); }
+  .grade-b .grade-letter { color: var(--amber); }
+  .grade-c .grade-letter { color: var(--red); }
+  .grade-a { background: rgba(16,185,129,.08); border-color: rgba(16,185,129,.25); }
+  .grade-b { background: rgba(245,158,11,.08); border-color: rgba(245,158,11,.25); }
+  .grade-c { background: rgba(239,68,68,.08); border-color: rgba(239,68,68,.25); }
+  .grade-name { font-size: .82rem; color: var(--muted); margin-top: 4px; }
+  .kpi-list { display: flex; flex-direction: column; gap: 16px; }
+  .kpi-header { display: flex; justify-content: space-between; font-size: .85rem; margin-bottom: 7px; }
+  .kpi-name { font-weight: 600; }
+  .kpi-score { font-weight: 700; color: var(--cyan); }
+  .kpi-track { height: 8px; background: #eef1f5; border-radius: 4px; overflow: hidden; }
+  .kpi-bar { height: 100%; border-radius: 4px; width: 0; transition: width 1s ease; }
 
-    /* ── Stats Bar ────────────────────────────────────────── */
-    #stats-bar {
-      background: var(--navy-3);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      padding: 32px 0;
-    }
-    .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 0; }
-    .stat-item {
-      text-align: center; padding: 0 24px;
-      border-right: 1px solid var(--border);
-    }
-    .stat-item:last-child { border-right: none; }
-    .stat-number {
-      font-size: 2rem; font-weight: 800;
-      background: linear-gradient(135deg, var(--cyan), var(--green));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    }
-    .stat-label { font-size: .85rem; color: var(--muted); margin-top: 4px; }
+  /* Advice + passport */
+  #advice { background: var(--navy-2); }
+  .advice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 40px; }
+  .ai-advice h4 {
+    font-size: .9rem; font-weight: 700; color: var(--cyan); margin-bottom: 14px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .ai-advice ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .ai-advice li { font-size: .87rem; color: var(--muted); line-height: 1.6; padding-left: 16px; position: relative; }
+  .ai-advice li::before { content: '▸'; position: absolute; left: 0; color: var(--cyan); }
+  .passport-card { text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
+  .passport-card h4 { font-size: .9rem; font-weight: 700; color: var(--green); display: flex; align-items: center; gap: 6px; }
+  .passport-card p { font-size: .85rem; color: var(--muted); line-height: 1.6; }
+  .passport-btn {
+    width: 100%; padding: 14px;
+    background: linear-gradient(135deg, var(--green), #059669);
+    color: #fff; font-weight: 700; font-size: .95rem;
+    border-radius: 12px; border: none; cursor: pointer; transition: all .2s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 4px 20px rgba(16,185,129,.3);
+  }
+  .passport-btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+  .passport-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
 
-    /* ── Problem ──────────────────────────────────────────── */
-    #problem { background: var(--navy-2); }
-    .problem-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 28px; margin-top: 56px; }
-    .problem-card {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 36px 28px;
-      position: relative; overflow: hidden;
-    }
-    .problem-card::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--cyan), var(--green));
-    }
-    .problem-icon {
-      width: 52px; height: 52px; border-radius: 12px;
-      background: rgba(6,182,212,.12); border: 1px solid rgba(6,182,212,.2);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.5rem; margin-bottom: 20px;
-    }
-    .problem-card h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 12px; }
-    .problem-card p { font-size: .9rem; color: var(--muted); line-height: 1.7; }
-    .pain-tag {
-      display: inline-block; margin-top: 16px;
-      font-size: .72rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: .07em; padding: 4px 10px; border-radius: 6px;
-      background: rgba(239,68,68,.12); color: #f87171;
-      border: 1px solid rgba(239,68,68,.2);
-    }
+  /* Footer */
+  footer { background: var(--navy-3); border-top: 1px solid var(--border); padding: 28px 0; text-align: center; }
+  footer p { font-size: .82rem; color: var(--muted); }
 
-    /* ── Solution ─────────────────────────────────────────── */
-    #solution { background: var(--navy); }
-    .solution-flow {
-      display: flex; align-items: center; justify-content: center;
-      flex-wrap: wrap; gap: 0; margin: 56px 0 48px;
-    }
-    .flow-box {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 24px 28px; min-width: 200px;
-      text-align: center;
-    }
-    .flow-box .flow-icon { font-size: 2rem; margin-bottom: 8px; }
-    .flow-box h4 { font-size: .9rem; font-weight: 700; margin-bottom: 6px; }
-    .flow-box p { font-size: .78rem; color: var(--muted); }
-    .flow-arrow {
-      font-size: 1.8rem; color: var(--cyan); padding: 0 16px;
-      animation: bounce-x 1.5s ease-in-out infinite;
-    }
-    .solution-highlights { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; }
-    .highlight {
-      display: flex; align-items: flex-start; gap: 14px;
-      padding: 20px; border-radius: 12px;
-      background: rgba(6,182,212,.06); border: 1px solid var(--border);
-    }
-    .highlight .h-icon {
-      width: 40px; height: 40px; flex-shrink: 0; border-radius: 10px;
-      background: linear-gradient(135deg, var(--cyan), var(--green));
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.1rem;
-    }
-    .highlight h4 { font-size: .95rem; font-weight: 700; margin-bottom: 4px; }
-    .highlight p { font-size: .82rem; color: var(--muted); line-height: 1.6; }
+  /* Modal */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,.75); backdrop-filter: blur(8px);
+    align-items: center; justify-content: center; padding: 24px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: var(--navy-2); border: 1px solid var(--border);
+    border-radius: 20px; max-width: 480px; width: 100%; overflow: hidden;
+  }
+  .modal-header { background: linear-gradient(135deg, var(--cyan-d), #0e4f6b); padding: 26px 30px; }
+  .modal-header h2 { font-size: 1.2rem; font-weight: 800; color: #fff; }
+  .modal-header p { font-size: .82rem; color: rgba(255,255,255,.7); margin-top: 4px; }
+  .modal-body { padding: 26px 30px; }
+  .passport-grid { display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: start; }
+  .passport-field { margin-bottom: 12px; }
+  .passport-field .pf-label { font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+  .passport-field .pf-val { font-size: .92rem; font-weight: 600; }
+  .passport-score-big { text-align: center; padding: 14px 18px; background: rgba(6,182,212,.08); border: 1px solid var(--border); border-radius: 12px; }
+  .passport-score-big .ps-num {
+    font-size: 2.2rem; font-weight: 900;
+    background: linear-gradient(135deg, var(--cyan), var(--green));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .passport-score-big .ps-label { font-size: .7rem; color: var(--muted); }
+  .qr-placeholder { display: grid; grid-template-columns: repeat(9,1fr); gap: 2px; width: 90px; height: 90px; margin: 10px auto 0; }
+  .qr-cell { border-radius: 1px; }
+  .passport-link {
+    margin-top: 16px; padding: 10px 14px; background: #f7f9fb;
+    border: 1px solid #e5e9ef; border-radius: 8px;
+    font-size: .78rem; color: var(--cyan-d); word-break: break-all;
+  }
+  .modal-footer { padding: 18px 30px; border-top: 1px solid var(--border); display: flex; gap: 12px; }
+  .btn-close-modal {
+    flex: 1; padding: 12px; border-radius: 10px; border: 1.5px solid var(--border);
+    background: transparent; color: #1a2333; font-weight: 600; cursor: pointer; transition: all .2s;
+  }
+  .btn-close-modal:hover { background: #f7f9fb; }
+  .btn-download {
+    flex: 1; padding: 12px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--green), #059669);
+    color: #fff; font-weight: 700; border: none; cursor: pointer; transition: all .2s;
+  }
+  .btn-download:hover { filter: brightness(1.08); }
 
-    /* ── Methodology ──────────────────────────────────────── */
-    #methodology { background: var(--navy-2); }
-    .method-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 28px; margin-top: 56px; }
-    .method-card {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 32px; position: relative; overflow: hidden;
-    }
-    .method-weight {
-      position: absolute; top: 20px; right: 20px;
-      font-size: .75rem; font-weight: 800; color: var(--cyan);
-      background: rgba(6,182,212,.12); border: 1px solid rgba(6,182,212,.25);
-      padding: 4px 12px; border-radius: 100px;
-    }
-    .method-num {
-      display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
-    }
-    .method-num .num {
-      width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.3rem; font-weight: 900;
-    }
-    .method-card h3 { font-size: 1.1rem; font-weight: 800; }
-    .method-card .ref {
-      font-size: .75rem; color: var(--muted); margin-bottom: 16px;
-    }
-    .formula-box {
-      background: rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.08);
-      border-radius: 10px; padding: 14px 18px; margin: 14px 0;
-      font-family: 'Courier New', monospace; font-size: .88rem; color: var(--cyan);
-    }
-    .score-tiers { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-    .score-tiers li {
-      display: flex; align-items: center; gap: 10px;
-      font-size: .82rem;
-    }
-    .tier-bar {
-      height: 6px; border-radius: 3px; flex-shrink: 0;
-    }
-    .tier-a { background: var(--green); width: 48px; }
-    .tier-b { background: var(--amber); width: 36px; }
-    .tier-c { background: #f97316; width: 24px; }
-    .tier-d { background: var(--red); width: 12px; }
-
-    /* ── Calculator ───────────────────────────────────────── */
-    #calculator { background: var(--navy); }
-    .calc-wrapper {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 32px; margin-top: 56px;
-    }
-    .calc-inputs, .calc-results {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 36px;
-    }
-    .calc-inputs h3, .calc-results h3 {
-      font-size: 1.15rem; font-weight: 700; margin-bottom: 28px;
-      padding-bottom: 16px; border-bottom: 1px solid var(--border);
-    }
-    .input-group { margin-bottom: 20px; }
-    .input-group label {
-      display: block; font-size: .82rem; font-weight: 600;
-      color: var(--muted); margin-bottom: 7px; text-transform: uppercase;
-      letter-spacing: .05em;
-    }
-    .input-group input {
-      width: 100%; padding: 12px 16px;
-      background: rgba(0,0,0,.3); border: 1px solid rgba(255,255,255,.1);
-      border-radius: 10px; color: var(--text); font-size: .95rem;
-      transition: border-color .2s;
-      outline: none;
-    }
-    .input-group input:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(6,182,212,.12); }
-    .input-group .unit {
-      font-size: .75rem; color: var(--muted); margin-top: 4px;
-    }
-    .calc-btn {
-      width: 100%; margin-top: 8px;
-      background: linear-gradient(135deg, var(--cyan), var(--cyan-d));
-      color: #fff; font-size: 1rem; font-weight: 700;
-      padding: 15px; border-radius: 12px; border: none; cursor: pointer;
-      transition: all .2s;
-      box-shadow: 0 4px 20px rgba(6,182,212,.3);
-    }
-    .calc-btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
-    .calc-btn:active { transform: translateY(0); }
-
-    /* Score gauge */
-    .gauge-wrap { display: flex; justify-content: center; margin-bottom: 28px; }
-    .gauge-svg { transform: rotate(-90deg); }
-    .gauge-track { fill: none; stroke: rgba(255,255,255,.08); stroke-width: 14; }
-    .gauge-fill {
-      fill: none; stroke-width: 14; stroke-linecap: round;
-      stroke-dasharray: 339.292; stroke-dashoffset: 339.292;
-      transition: stroke-dashoffset 1s ease, stroke .5s;
-    }
-    .gauge-center {
-      position: absolute; inset: 0;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-    }
-    .gauge-container { position: relative; width: 160px; height: 160px; }
-    .gauge-score {
-      font-size: 2.6rem; font-weight: 900;
-      background: linear-gradient(135deg, var(--cyan), var(--green));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    }
-    .gauge-label { font-size: .75rem; color: var(--muted); }
-
-    /* KPI bars */
-    .kpi-list { display: flex; flex-direction: column; gap: 16px; }
-    .kpi-row { }
-    .kpi-header {
-      display: flex; justify-content: space-between;
-      font-size: .82rem; margin-bottom: 7px;
-    }
-    .kpi-name { font-weight: 600; }
-    .kpi-score { font-weight: 700; color: var(--cyan); }
-    .kpi-track {
-      height: 8px; background: rgba(255,255,255,.07);
-      border-radius: 4px; overflow: hidden;
-    }
-    .kpi-bar {
-      height: 100%; border-radius: 4px;
-      background: linear-gradient(90deg, var(--cyan), var(--green));
-      width: 0; transition: width 1s ease;
-    }
-
-    /* Grade badge */
-    .grade-display {
-      text-align: center; padding: 20px;
-      border-radius: 14px; margin-bottom: 24px;
-      border: 1px solid var(--border);
-    }
-    .grade-letter {
-      font-size: 3.5rem; font-weight: 900; line-height: 1;
-    }
-    .grade-a .grade-letter { color: var(--green); }
-    .grade-b .grade-letter { color: var(--amber); }
-    .grade-c .grade-letter { color: var(--red); }
-    .grade-a { background: rgba(16,185,129,.08); border-color: rgba(16,185,129,.25); }
-    .grade-b { background: rgba(245,158,11,.08); border-color: rgba(245,158,11,.25); }
-    .grade-c { background: rgba(239,68,68,.08); border-color: rgba(239,68,68,.25); }
-    .grade-name { font-size: .85rem; color: var(--muted); margin-top: 4px; }
-
-    /* AI advice */
-    .ai-advice {
-      background: rgba(6,182,212,.07); border: 1px solid rgba(6,182,212,.2);
-      border-radius: 12px; padding: 16px;
-    }
-    .ai-advice h4 {
-      font-size: .82rem; font-weight: 700; color: var(--cyan);
-      margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
-    }
-    .ai-advice ul { list-style: none; display: flex; flex-direction: column; gap: 7px; }
-    .ai-advice li { font-size: .8rem; color: var(--muted); line-height: 1.5; padding-left: 14px; position: relative; }
-    .ai-advice li::before { content: '▸'; position: absolute; left: 0; color: var(--cyan); }
-
-    .passport-btn-wrap { margin-top: 20px; }
-    .passport-btn {
-      width: 100%; padding: 13px;
-      background: linear-gradient(135deg, var(--green), #059669);
-      color: #fff; font-weight: 700; font-size: .95rem;
-      border-radius: 12px; border: none; cursor: pointer;
-      transition: all .2s; display: flex; align-items: center;
-      justify-content: center; gap: 8px;
-      box-shadow: 0 4px 20px rgba(16,185,129,.3);
-    }
-    .passport-btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
-    .passport-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
-
-    .calc-empty {
-      display: flex; flex-direction: column; align-items: center;
-      justify-content: center; min-height: 400px; color: var(--muted);
-      gap: 12px;
-    }
-    .calc-empty .empty-icon { font-size: 3rem; opacity: .4; }
-    .calc-empty p { font-size: .9rem; }
-
-    /* ── How It Works ─────────────────────────────────────── */
-    #how-it-works { background: var(--navy-2); }
-    .steps-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 32px; margin-top: 56px; position: relative; }
-    .steps-grid::before {
-      content: ''; position: absolute; top: 48px; left: calc(50%/3 + 50%/3);;
-      width: 50%; height: 2px;
-      background: linear-gradient(90deg, var(--cyan), var(--green));
-      z-index: 0;
-    }
-    .step-card { text-align: center; position: relative; z-index: 1; }
-    .step-num-wrap {
-      width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 24px;
-      background: linear-gradient(135deg, var(--cyan), var(--green));
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.8rem; font-weight: 900; color: #fff;
-      box-shadow: 0 0 40px rgba(6,182,212,.4);
-    }
-    .step-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 12px; }
-    .step-card p { font-size: .88rem; color: var(--muted); line-height: 1.7; }
-    .step-details { margin-top: 16px; list-style: none; display: flex; flex-direction: column; gap: 6px; }
-    .step-details li {
-      font-size: .8rem; color: var(--muted);
-      display: flex; align-items: center; justify-content: center; gap: 6px;
-    }
-    .step-details li::before { content: '✓'; color: var(--green); font-weight: 700; }
-
-    /* ── Value Prop ───────────────────────────────────────── */
-    #value-prop { background: var(--navy); }
-    .vp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 56px; }
-    .vp-card {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 36px; overflow: hidden; position: relative;
-    }
-    .vp-card::after {
-      content: ''; position: absolute; bottom: -60px; right: -60px;
-      width: 200px; height: 200px; border-radius: 50%;
-      opacity: .04;
-    }
-    .vp-card.for-farmer::after { background: var(--green); }
-    .vp-card.for-buyer::after { background: var(--cyan); }
-    .vp-tag {
-      font-size: .72rem; font-weight: 800; text-transform: uppercase;
-      letter-spacing: .1em; padding: 4px 12px; border-radius: 100px;
-      display: inline-block; margin-bottom: 16px;
-    }
-    .vp-tag.green { background: rgba(16,185,129,.15); color: var(--green); }
-    .vp-tag.blue { background: rgba(6,182,212,.15); color: var(--cyan); }
-    .vp-card h3 { font-size: 1.3rem; font-weight: 800; margin-bottom: 24px; }
-    .vp-benefits { list-style: none; display: flex; flex-direction: column; gap: 16px; }
-    .vp-benefits li {
-      display: flex; align-items: flex-start; gap: 12px;
-      font-size: .9rem; line-height: 1.6;
-    }
-    .vp-benefits .icon {
-      width: 28px; height: 28px; flex-shrink: 0; border-radius: 8px;
-      display: flex; align-items: center; justify-content: center; font-size: .9rem;
-    }
-    .vp-benefits .icon.g { background: rgba(16,185,129,.15); }
-    .vp-benefits .icon.b { background: rgba(6,182,212,.15); }
-
-    /* ── CTA ──────────────────────────────────────────────── */
-    #cta {
-      background: linear-gradient(135deg, rgba(6,182,212,.1) 0%, rgba(16,185,129,.1) 100%);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-    }
-    .cta-quote {
-      font-size: clamp(1.1rem, 2vw, 1.4rem);
-      font-style: italic; color: var(--muted);
-      line-height: 1.75; max-width: 860px; margin: 0 auto 40px;
-      text-align: center; padding: 0 20px;
-    }
-    .cta-quote strong { color: var(--text); font-style: normal; }
-    .cta-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
-
-    /* ── Footer ───────────────────────────────────────────── */
-    footer {
-      background: var(--navy-3);
-      border-top: 1px solid var(--border);
-      padding: 48px 0 28px;
-    }
-    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 40px; }
-    .footer-brand p { font-size: .87rem; color: var(--muted); line-height: 1.7; margin-top: 14px; max-width: 260px; }
-    .footer-col h4 { font-size: .85rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 16px; color: var(--muted); }
-    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-    .footer-col ul li a { font-size: .87rem; color: var(--muted); transition: color .2s; }
-    .footer-col ul li a:hover { color: var(--text); }
-    .footer-bottom {
-      border-top: 1px solid var(--border); padding-top: 24px;
-      display: flex; justify-content: space-between; align-items: center;
-      flex-wrap: wrap; gap: 12px;
-    }
-    .footer-bottom p { font-size: .82rem; color: var(--muted); }
-    .standards {
-      display: flex; gap: 10px; flex-wrap: wrap;
-    }
-    .std-badge {
-      font-size: .7rem; font-weight: 700; padding: 3px 10px;
-      border-radius: 100px; border: 1px solid var(--border);
-      color: var(--muted);
-    }
-
-    /* ── Modal ────────────────────────────────────────────── */
-    .modal-overlay {
-      display: none; position: fixed; inset: 0; z-index: 200;
-      background: rgba(0,0,0,.75); backdrop-filter: blur(8px);
-      align-items: center; justify-content: center; padding: 24px;
-    }
-    .modal-overlay.open { display: flex; }
-    .modal-box {
-      background: var(--navy-2); border: 1px solid var(--border);
-      border-radius: 20px; max-width: 520px; width: 100%;
-      overflow: hidden; animation: pop-in .25s ease;
-    }
-    .modal-header {
-      background: linear-gradient(135deg, var(--cyan-d), #0e4f6b);
-      padding: 28px 32px;
-    }
-    .modal-header h2 { font-size: 1.3rem; font-weight: 800; }
-    .modal-header p { font-size: .85rem; color: rgba(255,255,255,.7); margin-top: 4px; }
-    .modal-body { padding: 28px 32px; }
-    .passport-grid { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: start; }
-    .passport-field { margin-bottom: 14px; }
-    .passport-field .pf-label { font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 2px; }
-    .passport-field .pf-val { font-size: .95rem; font-weight: 600; }
-    .passport-score-big {
-      text-align: center; padding: 16px 20px;
-      background: rgba(6,182,212,.08); border: 1px solid var(--border);
-      border-radius: 12px;
-    }
-    .passport-score-big .ps-num {
-      font-size: 2.5rem; font-weight: 900;
-      background: linear-gradient(135deg, var(--cyan), var(--green));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    }
-    .passport-score-big .ps-label { font-size: .72rem; color: var(--muted); }
-    .qr-placeholder {
-      display: grid; grid-template-columns: repeat(9,1fr); gap: 2px;
-      width: 96px; height: 96px; margin: 12px auto 0;
-    }
-    .qr-cell { border-radius: 1px; }
-    .modal-footer {
-      padding: 20px 32px; border-top: 1px solid var(--border);
-      display: flex; gap: 12px;
-    }
-    .btn-close-modal {
-      flex: 1; padding: 12px; border-radius: 10px;
-      border: 1.5px solid var(--border); background: transparent;
-      color: var(--text); font-weight: 600; cursor: pointer;
-      transition: all .2s;
-    }
-    .btn-close-modal:hover { background: rgba(255,255,255,.05); }
-    .btn-download {
-      flex: 1; padding: 12px; border-radius: 10px;
-      background: linear-gradient(135deg, var(--green), #059669);
-      color: #fff; font-weight: 700; border: none; cursor: pointer;
-      transition: all .2s;
-    }
-    .btn-download:hover { filter: brightness(1.08); }
-
-    /* ── Animations ───────────────────────────────────────── */
-    @keyframes float-up {
-      0%   { transform: translateY(100vh) scale(0); opacity: 0; }
-      10%  { opacity: 1; }
-      90%  { opacity: .5; }
-      100% { transform: translateY(-10vh) scale(1); opacity: 0; }
-    }
-    @keyframes pulse-dot {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50%       { opacity: .5; transform: scale(1.4); }
-    }
-    @keyframes bounce-x {
-      0%, 100% { transform: translateX(0); }
-      50%       { transform: translateX(6px); }
-    }
-    @keyframes pop-in {
-      0%   { transform: scale(.92); opacity: 0; }
-      100% { transform: scale(1);   opacity: 1; }
-    }
-    .fade-up {
-      opacity: 0; transform: translateY(30px);
-      transition: opacity .6s ease, transform .6s ease;
-    }
-    .fade-up.visible { opacity: 1; transform: translateY(0); }
-
-    /* ── Responsive ───────────────────────────────────────── */
-    @media (max-width: 1024px) {
-      .footer-grid { grid-template-columns: 1fr 1fr; }
-      .stats-grid { grid-template-columns: repeat(2,1fr); gap: 24px; }
-      .stat-item { border-right: none; border-bottom: 1px solid var(--border); padding-bottom: 24px; }
-      .stat-item:last-child, .stat-item:nth-child(2) { border-bottom: none; }
-    }
-    @media (max-width: 900px) {
-      .problem-cards, .solution-highlights, .method-grid,
-      .calc-wrapper, .vp-grid { grid-template-columns: 1fr; }
-      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
-      .steps-grid { grid-template-columns: 1fr; }
-      .steps-grid::before { display: none; }
-      .flow-arrow { transform: rotate(90deg); padding: 10px 0; animation: none; }
-      .solution-flow { flex-direction: column; }
-      .nav-links, .nav-cta .btn-outline { display: none; }
-      .hamburger { display: flex; }
-      .footer-grid { grid-template-columns: 1fr; }
-    }
-    @media (max-width: 600px) {
-      .section { padding: 64px 0; }
-      .hero-title { font-size: 2rem; }
-      .hero-stats { flex-direction: column; gap: 16px; }
-      .passport-grid { grid-template-columns: 1fr; }
-    }
-  </style>
+  @media (max-width: 800px) {
+    .upload-grid, .score-layout, .advice-grid, .passport-grid { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+  }
+</style>
 </head>
 <body>
 
-<!-- ── NAVBAR ─────────────────────────────────────────────── -->
 <nav id="navbar">
   <div class="container nav-inner">
     <a href="#hero" class="nav-logo">
       <div class="logo-icon">🦐</div>
-      <span>AquaValue <span class="gradient-text">AI</span></span>
+      <span>Aqua <span class="gradient-text">AI</span></span>
     </a>
     <ul class="nav-links">
-      <li><a href="#problem">Problem</a></li>
-      <li><a href="#solution">Solution</a></li>
-      <li><a href="#methodology">Methodology</a></li>
-      <li><a href="#calculator">Calculator</a></li>
-      <li><a href="#how-it-works">How It Works</a></li>
-      <li><a href="#value-prop">Value</a></li>
+      <li><a href="#upload">Upload Data</a></li>
+      <li><a href="#score">Green Score</a></li>
+      <li><a href="#advice">Advice & Passport</a></li>
     </ul>
-    <div class="nav-cta">
-      <a href="#calculator" class="btn btn-outline">Try Calculator</a>
-      <a href="#calculator" class="btn btn-primary">Get Green Passport ↗</a>
-    </div>
-    <div class="hamburger" id="hamburger">
-      <span></span><span></span><span></span>
-    </div>
   </div>
 </nav>
 
-<!-- ── HERO ───────────────────────────────────────────────── -->
+<!-- HERO -->
 <section id="hero">
-  <canvas id="bubbles"></canvas>
-  <div class="container hero-content">
-    <div class="hero-label">
-      <span></span>
-      Smart Aquaculture · ESG Technology · AI-Powered
-    </div>
-    <h1 class="hero-title">
-      Turn Farm Data Into<br>
-      <span class="gradient-text">Verified Green Scores</span><br>
-      & Premium Exports
-    </h1>
+  <div class="container">
+    <h1 class="hero-title">Turn Farm Data Into a<br><span class="gradient-text">Verified Green Score</span></h1>
     <p class="hero-desc">
-      AquaValue AI transforms the everyday harvest data you already collect—feed, yield,
-      electricity, survival rate—into globally recognized Sustainability Scores and
-      Digital Green Passports. Zero extra workload required.
+      Upload your harvest sheet or type in 4 numbers. Get an instant Green Score,
+      simple AI tips to improve it, and a shareable Green Passport for buyers.
     </p>
-    <div class="hero-actions">
-      <a href="#calculator" class="btn btn-primary" style="font-size:1rem;padding:15px 32px;">
-        🧮 Try the Score Calculator
-      </a>
-      <a href="#solution" class="btn btn-outline" style="font-size:1rem;padding:15px 32px;">
-        Learn How It Works
-      </a>
-    </div>
-    <div class="hero-stats">
-      <div class="hero-stat">
-        <strong>100</strong>
-        <span>Point Sustainability Score</span>
-      </div>
-      <div class="hero-stat">
-        <strong>4 KPIs</strong>
-        <span>Globally Referenced Standards</span>
-      </div>
-      <div class="hero-stat">
-        <strong>10–15%</strong>
-        <span>Potential Cost Reduction</span>
-      </div>
-      <div class="hero-stat">
-        <strong>0</strong>
-        <span>Extra Paperwork Required</span>
-      </div>
-    </div>
-  </div>
-  <div class="wave-divider">
-    <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" fill="#0a1628"/>
-    </svg>
-  </div>
-</section>
-
-<!-- ── STATS BAR ───────────────────────────────────────────── -->
-<section id="stats-bar">
-  <div class="container">
-    <div class="stats-grid">
-      <div class="stat-item">
-        <div class="stat-number">ASC / BAP</div>
-        <div class="stat-label">International Standards Referenced</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-number">FAO GHG</div>
-        <div class="stat-label">Carbon Protocol Alignment</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-number">EU + US</div>
-        <div class="stat-label">Export Markets Unlocked</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-number">Grade A</div>
-        <div class="stat-label">Score ≥ 80 → Green Passport Eligible</div>
-      </div>
+    <div class="steps-strip">
+      <div class="step-chip"><span class="n">1</span> Upload Data</div>
+      <div class="step-chip"><span class="n">2</span> Auto Green Score</div>
+      <div class="step-chip"><span class="n">3</span> Advice & Passport</div>
     </div>
   </div>
 </section>
 
-<!-- ── PROBLEM ─────────────────────────────────────────────── -->
-<section id="problem" class="section">
+<!-- 1. UPLOAD DATA -->
+<section id="upload" class="section">
   <div class="container">
-    <div class="text-center fade-up">
-      <div class="badge">🔍 The Problem</div>
-      <h2 class="section-title">Why Shrimp Farmers Are<br><span class="gradient-text">Missing Out</span></h2>
+    <div class="text-center">
+      <div class="badge">1 · Upload Data</div>
+      <h2 class="section-title">Bring In Your Harvest Numbers</h2>
       <p class="section-sub center">
-        Your farm generates valuable data every harvest cycle. But without the right tools,
-        that data sits idle—costing you premium market access and profit margins.
-      </p>
-    </div>
-    <div class="problem-cards">
-      <div class="card problem-card fade-up">
-        <div class="problem-icon">📊</div>
-        <h3>Wasted Productivity Data</h3>
-        <p>
-          Farmers already record feed usage, yield, electricity consumption, and survival rates
-          after every harvest. This data is used only to calculate profit/loss—then discarded.
-          The strategic value of this information is completely untapped.
-        </p>
-        <span class="pain-tag">Data Silo Problem</span>
-      </div>
-      <div class="card problem-card fade-up">
-        <div class="problem-icon">💰</div>
-        <h3>Missing Premium Export Pricing</h3>
-        <p>
-          International buyers, retail chains, and cold storage operators pay significantly
-          more for sustainably sourced shrimp. Most farms cannot prove or certify sustainability
-          due to the complexity and high cost of international standard assessments.
-        </p>
-        <span class="pain-tag">Lost Revenue Opportunity</span>
-      </div>
-      <div class="card problem-card fade-up">
-        <div class="problem-icon">⚡</div>
-        <h3>Invisible Operational Inefficiency</h3>
-        <p>
-          Without converting production numbers into sustainability indices, farmers cannot see
-          whether their FCR or aerator runtime exceeds industry benchmarks—leading to hidden
-          cost overruns and elevated water pollution loads.
-        </p>
-        <span class="pain-tag">Unseen Cost Leakage</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ── SOLUTION ────────────────────────────────────────────── -->
-<section id="solution" class="section" style="background:var(--navy)">
-  <div class="container">
-    <div class="text-center fade-up">
-      <div class="badge">💡 The Solution</div>
-      <h2 class="section-title">AquaValue AI:<br><span class="gradient-text">Your Data Translation Engine</span></h2>
-      <p class="section-sub center">
-        We don't change what you do. We change what your data is worth.
-        By running your existing harvest reports through internationally recognized formulas,
-        we generate verifiable sustainability credentials in seconds.
+        Upload your existing Excel/CSV sheet, or just type in 4 basic numbers from your last harvest cycle.
       </p>
     </div>
 
-    <div class="solution-flow fade-up">
-      <div class="flow-box">
-        <div class="flow-icon">📋</div>
-        <h4>Your Existing Data</h4>
-        <p>Feed, Yield, kWh,<br>Survival Rate</p>
+    <div class="upload-grid">
+      <div class="upload-box card">
+        <h3>📄 Upload Excel Sheet</h3>
+        <p class="hint">.xlsx, .xls or .csv — we'll read Feed, Harvest, Electricity & Water columns</p>
+        <div class="file-drop" onclick="document.getElementById('file-input').click()">
+          <div class="icon">📤</div>
+          <div>Click to choose a file</div>
+          <div class="fname" id="file-name"></div>
+        </div>
+        <input type="file" id="file-input" accept=".xlsx,.xls,.csv" onchange="handleFile(event)" />
       </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-box" style="border-color:rgba(6,182,212,.4);background:rgba(6,182,212,.08)">
-        <div class="flow-icon">🤖</div>
-        <h4>AquaValue AI Engine</h4>
-        <p>ASC / BAP / FAO<br>Calculation Rules</p>
-      </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-box">
-        <div class="flow-icon">🏆</div>
-        <h4>Sustainability Score</h4>
-        <p>Grade A / B / C<br>Instant Rating</p>
-      </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-box" style="border-color:rgba(16,185,129,.4);background:rgba(16,185,129,.08)">
-        <div class="flow-icon">🛂</div>
-        <h4>Digital Green Passport</h4>
-        <p>QR Code for<br>Export Buyers</p>
+
+      <div class="upload-box card">
+        <h3>✍️ Or Type 4 Numbers</h3>
+        <p class="hint">From your last harvest cycle summary</p>
+        <div style="text-align:left;flex:1">
+          <div class="input-group">
+            <label>Total Feed Used</label>
+            <input type="number" id="inp-feed" placeholder="e.g. 5000" min="0" />
+            <div class="unit">kilograms (kg)</div>
+          </div>
+          <div class="input-group">
+            <label>Total Harvest Weight</label>
+            <input type="number" id="inp-harvest" placeholder="e.g. 3500" min="0" />
+            <div class="unit">kilograms (kg)</div>
+          </div>
+          <div class="input-group">
+            <label>Electricity Used</label>
+            <input type="number" id="inp-electric" placeholder="e.g. 12000" min="0" />
+            <div class="unit">kilowatt-hours (kWh)</div>
+          </div>
+          <div class="input-group">
+            <label>Water Changed</label>
+            <input type="number" id="inp-water" placeholder="e.g. 800" min="0" />
+            <div class="unit">cubic meters (m³)</div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="solution-highlights fade-up">
-      <div class="highlight">
-        <div class="h-icon">⚡</div>
-        <div>
-          <h4>Zero Extra Workflow</h4>
-          <p>Uses your existing harvest summary. No new sensors, no new forms, no new data collection habits required.</p>
-        </div>
-      </div>
-      <div class="highlight">
-        <div class="h-icon">🌐</div>
-        <div>
-          <h4>Globally Referenced Formulas</h4>
-          <p>Every calculation is based on ASC, BAP, FAO GHG Protocol, and ISO 14064 standards—recognized by EU and US buyers.</p>
-        </div>
-      </div>
-      <div class="highlight">
-        <div class="h-icon">💬</div>
-        <div>
-          <h4>AI Eco-Helper</h4>
-          <p>Personalized recommendations to improve your score next cycle, with estimated cost savings in baht.</p>
-        </div>
-      </div>
+    <div style="max-width:480px;margin:28px auto 0">
+      <button class="calc-btn" onclick="calculateScore()">⚡ Calculate My Green Score</button>
     </div>
   </div>
 </section>
 
-<!-- ── METHODOLOGY ─────────────────────────────────────────── -->
-<section id="methodology" class="section">
+<!-- 2. AUTO GREEN SCORE -->
+<section id="score" class="section">
   <div class="container">
-    <div class="text-center fade-up">
-      <div class="badge">📐 Methodology</div>
-      <h2 class="section-title">The Science Behind<br><span class="gradient-text">Your Sustainability Score</span></h2>
-      <p class="section-sub center">
-        AquaValue AI computes a 100-point Sustainability Score from 4 internationally
-        benchmarked KPIs. Every formula and threshold references a real global standard.
-      </p>
+    <div class="text-center">
+      <div class="badge">2 · Auto Green Score</div>
+      <h2 class="section-title">Your Farm's Green Score</h2>
+      <p class="section-sub center">Scored automatically from your 4 numbers using standard efficiency rules — low feed waste, low energy use, and low water discharge earn more points.</p>
     </div>
 
-    <div class="method-grid">
-      <!-- FCR -->
-      <div class="method-card fade-up">
-        <div class="method-weight">35 pts</div>
-        <div class="method-num">
-          <div class="num" style="background:linear-gradient(135deg,#06b6d4,#0e7490);color:#fff">1</div>
-          <div>
-            <h3>Feed Conversion Ratio (FCR)</h3>
-            <div class="ref">Reference: ASC Shrimp Standard v1.1 · BAP Farm Standard Sec.6</div>
-          </div>
-        </div>
-        <p style="font-size:.87rem;color:var(--muted);line-height:1.7;margin-bottom:14px">
-          Feed accounts for 60–70% of total production cost. Excess feeding is the primary
-          cause of water body degradation and greenhouse gas emissions.
-        </p>
-        <div class="formula-box">FCR = Total Feed Used (kg) ÷ Total Harvested Yield (kg)</div>
-        <ul class="score-tiers">
-          <li><div class="tier-bar tier-a"></div><strong style="color:var(--green)">≤ 1.20</strong> → 35 pts — Excellent</li>
-          <li><div class="tier-bar tier-b"></div><strong style="color:var(--amber)">1.21–1.40</strong> → 25 pts — Industry Standard</li>
-          <li><div class="tier-bar tier-c"></div><strong style="color:#f97316">1.41–1.60</strong> → 15 pts — Below Average</li>
-          <li><div class="tier-bar tier-d"></div><strong style="color:var(--red)">> 1.60</strong> → 0 pts — High Waste</li>
-        </ul>
-      </div>
-
-      <!-- Energy -->
-      <div class="method-card fade-up">
-        <div class="method-weight">25 pts</div>
-        <div class="method-num">
-          <div class="num" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff">2</div>
-          <div>
-            <h3>Energy & Carbon Intensity</h3>
-            <div class="ref">Reference: FAO GHG Emissions Guidelines · ISO 14064 Scope 2</div>
-          </div>
-        </div>
-        <p style="font-size:.87rem;color:var(--muted);line-height:1.7;margin-bottom:14px">
-          Aerators and pump systems are the largest electricity consumers on a shrimp farm.
-          Energy intensity per ton of output directly reflects carbon footprint.
-        </p>
-        <div class="formula-box">Energy Intensity (kWh/Ton) = Total kWh ÷ Yield (Tons)</div>
-        <ul class="score-tiers">
-          <li><div class="tier-bar tier-a"></div><strong style="color:var(--green)">≤ 2,500 kWh/Ton</strong> → 25 pts — High Efficiency</li>
-          <li><div class="tier-bar tier-b"></div><strong style="color:var(--amber)">2,501–3,500</strong> → 15 pts — Farm Average</li>
-          <li><div class="tier-bar tier-d"></div><strong style="color:var(--red)">> 3,500</strong> → 5 pts — Over-consuming</li>
-        </ul>
-      </div>
-
-      <!-- Survival Rate -->
-      <div class="method-card fade-up">
-        <div class="method-weight">20 pts</div>
-        <div class="method-num">
-          <div class="num" style="background:linear-gradient(135deg,#10b981,#059669);color:#fff">3</div>
-          <div>
-            <h3>Animal Welfare & Survival Rate</h3>
-            <div class="ref">Reference: FAO Code of Conduct · BAP Animal Welfare Standard</div>
-          </div>
-        </div>
-        <p style="font-size:.87rem;color:var(--muted);line-height:1.7;margin-bottom:14px">
-          High survival rates reflect excellent water quality management, good animal welfare
-          conditions, and reduced antibiotic dependency—all critical for export certification.
-        </p>
-        <div class="formula-box">Survival Rate (%) = (Harvested Count ÷ Stocked Post-Larvae) × 100</div>
-        <ul class="score-tiers">
-          <li><div class="tier-bar tier-a"></div><strong style="color:var(--green)">≥ 80%</strong> → 20 pts — Excellent</li>
-          <li><div class="tier-bar tier-b"></div><strong style="color:var(--amber)">65%–79%</strong> → 12 pts — Acceptable</li>
-          <li><div class="tier-bar tier-d"></div><strong style="color:var(--red)">< 65%</strong> → 0 pts — Disease Risk</li>
-        </ul>
-      </div>
-
-      <!-- Water -->
-      <div class="method-card fade-up">
-        <div class="method-weight">20 pts</div>
-        <div class="method-num">
-          <div class="num" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff">4</div>
-          <div>
-            <h3>Water Resource Management</h3>
-            <div class="ref">Reference: Thailand GAP (TAS 7401) · ASC Effluent Standard 2.2</div>
-          </div>
-        </div>
-        <p style="font-size:.87rem;color:var(--muted);line-height:1.7;margin-bottom:14px">
-          Controlling water exchange and preventing untreated effluent from entering public
-          waterways is a core requirement of ASC and Thai GAP certification.
-        </p>
-        <div class="formula-box">Water Exchange Ratio = Water Discharged (m³) ÷ Pond Volume (m³)</div>
-        <ul class="score-tiers">
-          <li><div class="tier-bar tier-a"></div><strong style="color:var(--green)">≤ 1.0</strong> → 20 pts — Closed System</li>
-          <li><div class="tier-bar tier-b"></div><strong style="color:var(--amber)">1.1–3.0</strong> → 10 pts — Semi-closed</li>
-          <li><div class="tier-bar tier-d"></div><strong style="color:var(--red)">> 3.0</strong> → 0 pts — Open Discharge</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ── CALCULATOR ───────────────────────────────────────────── -->
-<section id="calculator" class="section">
-  <div class="container">
-    <div class="text-center fade-up">
-      <div class="badge">🧮 Live Calculator</div>
-      <h2 class="section-title">Calculate Your Farm's<br><span class="gradient-text">Sustainability Score</span></h2>
-      <p class="section-sub center">
-        Enter your harvest cycle data below. Your score is calculated instantly using
-        internationally recognized formulas—no sign-up required.
-      </p>
+    <div class="calc-empty" id="calc-empty">
+      <div class="empty-icon">📊</div>
+      <p>Enter your data above and click Calculate</p>
     </div>
 
-    <div class="calc-wrapper">
-      <!-- INPUTS -->
-      <div class="calc-inputs fade-up">
-        <h3>📥 Harvest Cycle Data Input</h3>
-
-        <div class="input-group">
-          <label>Total Feed Used</label>
-          <input type="number" id="inp-feed" placeholder="e.g. 5000" min="0" />
-          <div class="unit">kilograms (kg)</div>
-        </div>
-        <div class="input-group">
-          <label>Total Harvested Yield</label>
-          <input type="number" id="inp-yield" placeholder="e.g. 3500" min="0" />
-          <div class="unit">kilograms (kg)</div>
-        </div>
-        <div class="input-group">
-          <label>Total Electricity Consumed</label>
-          <input type="number" id="inp-kwh" placeholder="e.g. 12000" min="0" />
-          <div class="unit">kilowatt-hours (kWh)</div>
-        </div>
-        <div class="input-group">
-          <label>Stocked Post-Larvae Count</label>
-          <input type="number" id="inp-stocked" placeholder="e.g. 500000" min="0" />
-          <div class="unit">number of post-larvae (PL)</div>
-        </div>
-        <div class="input-group">
-          <label>Harvested Shrimp Count</label>
-          <input type="number" id="inp-harvested" placeholder="e.g. 420000" min="0" />
-          <div class="unit">number of shrimp harvested</div>
-        </div>
-        <div class="input-group">
-          <label>Total Water Discharged</label>
-          <input type="number" id="inp-water-out" placeholder="e.g. 800" min="0" />
-          <div class="unit">cubic meters (m³)</div>
-        </div>
-        <div class="input-group">
-          <label>Pond Volume</label>
-          <input type="number" id="inp-pond-vol" placeholder="e.g. 1000" min="0" />
-          <div class="unit">cubic meters (m³)</div>
-        </div>
-
-        <button class="calc-btn" onclick="calculateScore()">
-          ⚡ Calculate My Sustainability Score
-        </button>
-      </div>
-
-      <!-- RESULTS -->
-      <div class="calc-results fade-up" id="calc-results">
-        <div class="calc-empty" id="calc-empty">
-          <div class="empty-icon">📊</div>
-          <p>Enter your farm data and click Calculate</p>
-          <p style="font-size:.8rem;color:var(--muted);max-width:220px;text-align:center">
-            Your Sustainability Score, grade, and AI recommendations will appear here.
-          </p>
-        </div>
-        <div id="results-content" style="display:none">
-          <h3>📈 Your Sustainability Results</h3>
-          <div class="gauge-wrap" style="position:relative">
+    <div id="results-content">
+      <div class="score-layout">
+        <div class="card">
+          <div class="gauge-wrap">
             <div class="gauge-container">
               <svg class="gauge-svg" width="160" height="160" viewBox="0 0 120 120">
                 <circle class="gauge-track" cx="60" cy="60" r="54"/>
@@ -1058,268 +380,97 @@
               </div>
             </div>
           </div>
-
           <div class="grade-display" id="grade-display">
             <div class="grade-letter" id="grade-letter">–</div>
             <div class="grade-name" id="grade-name">–</div>
           </div>
+        </div>
 
-          <div class="kpi-list" style="margin-bottom:24px">
+        <div class="card">
+          <div class="kpi-list">
             <div class="kpi-row">
               <div class="kpi-header">
-                <span class="kpi-name">FCR Score <span style="color:var(--muted);font-size:.75rem" id="fcr-val"></span></span>
-                <span class="kpi-score" id="fcr-score">0/35</span>
+                <span class="kpi-name">Feed Efficiency <span style="color:var(--muted);font-size:.75rem" id="fcr-val"></span></span>
+                <span class="kpi-score" id="fcr-score">0/40</span>
               </div>
               <div class="kpi-track"><div class="kpi-bar" id="kpi-fcr" style="background:linear-gradient(90deg,var(--cyan),var(--green))"></div></div>
             </div>
             <div class="kpi-row">
               <div class="kpi-header">
-                <span class="kpi-name">Energy Score <span style="color:var(--muted);font-size:.75rem" id="energy-val"></span></span>
-                <span class="kpi-score" id="energy-score">0/25</span>
+                <span class="kpi-name">Energy Efficiency <span style="color:var(--muted);font-size:.75rem" id="energy-val"></span></span>
+                <span class="kpi-score" id="energy-score">0/30</span>
               </div>
               <div class="kpi-track"><div class="kpi-bar" id="kpi-energy" style="background:linear-gradient(90deg,#f59e0b,#d97706)"></div></div>
             </div>
             <div class="kpi-row">
               <div class="kpi-header">
-                <span class="kpi-name">Survival Score <span style="color:var(--muted);font-size:.75rem" id="survival-val"></span></span>
-                <span class="kpi-score" id="survival-score">0/20</span>
-              </div>
-              <div class="kpi-track"><div class="kpi-bar" id="kpi-survival" style="background:linear-gradient(90deg,var(--green),#059669)"></div></div>
-            </div>
-            <div class="kpi-row">
-              <div class="kpi-header">
-                <span class="kpi-name">Water Score <span style="color:var(--muted);font-size:.75rem" id="water-val"></span></span>
-                <span class="kpi-score" id="water-score">0/20</span>
+                <span class="kpi-name">Water Management <span style="color:var(--muted);font-size:.75rem" id="water-val"></span></span>
+                <span class="kpi-score" id="water-score">0/30</span>
               </div>
               <div class="kpi-track"><div class="kpi-bar" id="kpi-water" style="background:linear-gradient(90deg,#8b5cf6,#7c3aed)"></div></div>
             </div>
           </div>
-
-          <div class="ai-advice" id="ai-advice">
-            <h4>🤖 AI Eco-Helper Recommendations</h4>
-            <ul id="ai-tips"></ul>
-          </div>
-
-          <div class="passport-btn-wrap">
-            <button class="passport-btn" id="passport-btn" onclick="openPassport()" disabled>
-              🛂 Generate Digital Green Passport
-            </button>
-          </div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ── HOW IT WORKS ────────────────────────────────────────── -->
-<section id="how-it-works" class="section">
+<!-- 3. GET ADVICE & PASSPORT -->
+<section id="advice" class="section">
   <div class="container">
-    <div class="text-center fade-up">
-      <div class="badge">📲 How It Works</div>
-      <h2 class="section-title">Three Steps to Your<br><span class="gradient-text">Green Passport</span></h2>
-      <p class="section-sub center">
-        Designed for the mobile web. No app download. No complex setup.
-        Just enter your harvest numbers and walk away with export-ready credentials.
-      </p>
+    <div class="text-center">
+      <div class="badge">3 · Get Advice & Passport</div>
+      <h2 class="section-title">Improve & Prove It</h2>
+      <p class="section-sub center">Get simple AI tips to boost next round's score, then generate a Green Passport to show buyers.</p>
     </div>
-    <div class="steps-grid">
-      <div class="step-card fade-up">
-        <div class="step-num-wrap">1</div>
-        <h3>Quick Data Import</h3>
-        <p>Upload your post-harvest Excel/CSV or simply type 4–7 numbers from your harvest summary.</p>
-        <ul class="step-details">
-          <li>Total feed used (kg)</li>
-          <li>Total yield harvested (kg)</li>
-          <li>Electricity consumed (kWh)</li>
-          <li>Stocked & harvested counts</li>
+
+    <div class="advice-grid">
+      <div class="card ai-advice">
+        <h4>🤖 AI Eco-Helper Tips</h4>
+        <ul id="ai-tips">
+          <li>Calculate your score above to get personalized tips.</li>
         </ul>
       </div>
-      <div class="step-card fade-up">
-        <div class="step-num-wrap">2</div>
-        <h3>Real-Time Score & Grading</h3>
-        <p>AquaValue AI calculates your 4 KPI scores instantly and assigns your sustainability grade.</p>
-        <ul class="step-details">
-          <li>Grade A (80–100): Green Passport eligible</li>
-          <li>Grade B (60–79): Standard Farm</li>
-          <li>Grade C (&lt;60): Improvement needed</li>
-          <li>Detailed KPI breakdown shown</li>
-        </ul>
-      </div>
-      <div class="step-card fade-up">
-        <div class="step-num-wrap">3</div>
-        <h3>AI Advice + Green Passport</h3>
-        <p>Receive actionable improvement tips and generate a QR-coded digital certificate for buyers.</p>
-        <ul class="step-details">
-          <li>Personalized cost-saving tips</li>
-          <li>QR Code for cold storage / exporters</li>
-          <li>Traceability verification link</li>
-          <li>ESG compliance documentation</li>
-        </ul>
+
+      <div class="card passport-card">
+        <h4>🛂 Green Passport</h4>
+        <p>Generate a QR code / link that proves your Green Score to buyers, so you can negotiate a better selling price.</p>
+        <button class="passport-btn" id="passport-btn" onclick="openPassport()" disabled>
+          🛂 Generate Green Passport
+        </button>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ── VALUE PROP ──────────────────────────────────────────── -->
-<section id="value-prop" class="section" style="background:var(--navy-2)">
-  <div class="container">
-    <div class="text-center fade-up">
-      <div class="badge">🏆 Value Proposition</div>
-      <h2 class="section-title">Who Benefits and<br><span class="gradient-text">How They Win</span></h2>
-    </div>
-    <div class="vp-grid">
-      <div class="vp-card for-farmer fade-up">
-        <span class="vp-tag green">🌱 For Shrimp Farmers</span>
-        <h3>Turn Your Data Into Premium Market Access</h3>
-        <ul class="vp-benefits">
-          <li>
-            <div class="icon g">💹</div>
-            <div><strong>Cost Reduction (10–15%)</strong><br>Spot feed and energy inefficiencies you never noticed before, reducing input costs per cycle.</div>
-          </li>
-          <li>
-            <div class="icon g">💰</div>
-            <div><strong>Price Premium Opportunity</strong><br>Sell to cold storage and export buyers who pay a premium for certified sustainable shrimp.</div>
-          </li>
-          <li>
-            <div class="icon g">📜</div>
-            <div><strong>Fast Track to ASC/BAP Certification</strong><br>Your Green Passport data serves as pre-certification evidence, cutting consultancy costs significantly.</div>
-          </li>
-          <li>
-            <div class="icon g">🤖</div>
-            <div><strong>AI-Guided Improvement</strong><br>Personalized, cycle-by-cycle recommendations in plain language—no sustainability expert needed.</div>
-          </li>
-        </ul>
-      </div>
-      <div class="vp-card for-buyer fade-up">
-        <span class="vp-tag blue">🌊 For Exporters & Cold Storage</span>
-        <h3>Verified Traceability at Scale</h3>
-        <ul class="vp-benefits">
-          <li>
-            <div class="icon b">🔍</div>
-            <div><strong>Verified Traceability Data</strong><br>Scan any farm's QR code to instantly access globally referenced sustainability metrics—no farm audits required.</div>
-          </li>
-          <li>
-            <div class="icon b">🌍</div>
-            <div><strong>ESG Compliance Documentation</strong><br>Green Passport data can be incorporated directly into ESG reports required by EU and US retail chains.</div>
-          </li>
-          <li>
-            <div class="icon b">📊</div>
-            <div><strong>Supplier Portfolio Scoring</strong><br>Rank and select shrimp suppliers by sustainability performance to meet buyer requirements proactively.</div>
-          </li>
-          <li>
-            <div class="icon b">⚡</div>
-            <div><strong>Reduced Due Diligence Cost</strong><br>Replace expensive farm inspections with standardized digital credentials that travel with every shipment.</div>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ── CTA ─────────────────────────────────────────────────── -->
-<section id="cta" class="section-sm">
-  <div class="container text-center">
-    <div class="badge">🚀 Summary Pitch</div>
-    <blockquote class="cta-quote fade-up">
-      "<strong>AquaValue AI transforms everyday farm productivity data into globally verified
-      Sustainability Scores and Digital Green Passports</strong>—with zero extra workload.
-      We help farmers reduce operational waste, prove their eco-friendly practices to premium
-      buyers, and <strong>unlock higher profit margins in global export markets.</strong>"
-    </blockquote>
-    <div class="cta-actions fade-up">
-      <a href="#calculator" class="btn btn-primary" style="font-size:1rem;padding:15px 32px;">
-        🧮 Calculate My Score Now
-      </a>
-      <a href="#methodology" class="btn btn-outline" style="font-size:1rem;padding:15px 32px;">
-        📐 View Methodology
-      </a>
-    </div>
-  </div>
-</section>
-
-<!-- ── FOOTER ──────────────────────────────────────────────── -->
 <footer>
   <div class="container">
-    <div class="footer-grid">
-      <div class="footer-brand">
-        <div class="nav-logo" style="font-size:1.3rem">
-          <div class="logo-icon">🦐</div>
-          <span>AquaValue <span class="gradient-text">AI</span></span>
-        </div>
-        <p>Turning Daily Farm Productivity Data into Verifiable Green Scores & High-Margin Exports. Built for shrimp farmers, exporters, and eco-conscious buyers worldwide.</p>
-      </div>
-      <div class="footer-col">
-        <h4>Platform</h4>
-        <ul>
-          <li><a href="#calculator">Score Calculator</a></li>
-          <li><a href="#methodology">Methodology</a></li>
-          <li><a href="#how-it-works">How It Works</a></li>
-          <li><a href="#value-prop">Value Proposition</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4>Standards</h4>
-        <ul>
-          <li><a href="#">ASC Shrimp Standard v1.1</a></li>
-          <li><a href="#">BAP Farm Standard</a></li>
-          <li><a href="#">FAO GHG Protocol</a></li>
-          <li><a href="#">ISO 14064 Scope 2</a></li>
-          <li><a href="#">Thailand GAP TAS 7401</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4>Markets</h4>
-        <ul>
-          <li><a href="#">Shrimp Farmers</a></li>
-          <li><a href="#">Seafood Exporters</a></li>
-          <li><a href="#">Cold Storage Facilities</a></li>
-          <li><a href="#">Eco-Conscious Buyers</a></li>
-          <li><a href="#">ESG Compliance Teams</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <p>© 2026 AquaValue AI. Smart Aquaculture · ESG Technology. Category: Smart Agriculture / Aquaculture / AI</p>
-      <div class="standards">
-        <span class="std-badge">ASC</span>
-        <span class="std-badge">BAP</span>
-        <span class="std-badge">FAO GHG</span>
-        <span class="std-badge">ISO 14064</span>
-        <span class="std-badge">Thai GAP</span>
-      </div>
-    </div>
+    <p>🦐 Aqua AI — Upload data, get your Green Score, and earn your Green Passport.</p>
   </div>
 </footer>
 
-<!-- ── GREEN PASSPORT MODAL ────────────────────────────────── -->
+<!-- GREEN PASSPORT MODAL -->
 <div class="modal-overlay" id="passport-modal">
   <div class="modal-box">
     <div class="modal-header">
-      <h2>🛂 Digital Green Passport</h2>
-      <p>AquaValue AI · Sustainability Verification Certificate</p>
+      <h2>🛂 Green Passport</h2>
+      <p>Aqua AI · Farm Sustainability Certificate</p>
     </div>
     <div class="modal-body">
       <div class="passport-grid">
         <div>
           <div class="passport-field">
-            <div class="pf-label">Certificate Type</div>
-            <div class="pf-val">Sustainability Green Passport</div>
-          </div>
-          <div class="passport-field">
             <div class="pf-label">Issue Date</div>
             <div class="pf-val" id="pp-date">–</div>
           </div>
           <div class="passport-field">
-            <div class="pf-label">Sustainability Grade</div>
-            <div class="pf-val" id="pp-grade" style="font-size:1.2rem">–</div>
+            <div class="pf-label">Green Grade</div>
+            <div class="pf-val" id="pp-grade" style="font-size:1.15rem">–</div>
           </div>
           <div class="passport-field">
             <div class="pf-label">Total Score</div>
             <div class="pf-val" id="pp-score">–</div>
-          </div>
-          <div class="passport-field">
-            <div class="pf-label">Standards Referenced</div>
-            <div class="pf-val" style="font-size:.82rem">ASC · BAP · FAO GHG · ISO 14064 · Thai GAP</div>
           </div>
         </div>
         <div style="text-align:center">
@@ -1331,153 +482,72 @@
           <div style="font-size:.65rem;color:var(--muted);margin-top:6px">Scan to verify</div>
         </div>
       </div>
-      <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:16px">
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center">
-          <div>
-            <div style="font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">FCR</div>
-            <div style="font-weight:700;color:var(--cyan)" id="pp-fcr">–</div>
-          </div>
-          <div>
-            <div style="font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Energy</div>
-            <div style="font-weight:700;color:var(--cyan)" id="pp-energy">–</div>
-          </div>
-          <div>
-            <div style="font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Survival</div>
-            <div style="font-weight:700;color:var(--cyan)" id="pp-survival">–</div>
-          </div>
-          <div>
-            <div style="font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Water</div>
-            <div style="font-weight:700;color:var(--cyan)" id="pp-water">–</div>
-          </div>
-        </div>
-      </div>
+      <div class="passport-link" id="pp-link">–</div>
     </div>
     <div class="modal-footer">
       <button class="btn-close-modal" onclick="closePassport()">✕ Close</button>
-      <button class="btn-download" onclick="closePassport()">⬇ Download PDF</button>
+      <button class="btn-download" onclick="closePassport()">⬇ Download</button>
     </div>
   </div>
 </div>
 
 <script>
-/* ── Navbar scroll ─────────────────────────────────────── */
-window.addEventListener('scroll', () => {
-  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40);
-});
-
-/* ── Bubble canvas animation ───────────────────────────── */
-(function() {
-  const canvas = document.getElementById('bubbles');
-  const ctx = canvas.getContext('2d');
-  let bubbles = [];
-  function resize() {
-    canvas.width = window.innerWidth;
-    canvas.height = document.getElementById('hero').offsetHeight;
-  }
-  resize();
-  window.addEventListener('resize', resize);
-
-  function spawnBubble() {
-    const r = 4 + Math.random() * 18;
-    bubbles.push({
-      x: Math.random() * canvas.width,
-      y: canvas.height + r,
-      r,
-      speed: 0.4 + Math.random() * 1.2,
-      alpha: 0.06 + Math.random() * 0.18,
-      drift: (Math.random() - 0.5) * 0.5,
-    });
-  }
-
-  for (let i = 0; i < 30; i++) {
-    spawnBubble();
-    bubbles[i].y = Math.random() * canvas.height;
-  }
-
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    bubbles.forEach((b, i) => {
-      ctx.beginPath();
-      ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(6,182,212,${b.alpha})`;
-      ctx.lineWidth = 1.2;
-      ctx.stroke();
-
-      const grd = ctx.createRadialGradient(b.x - b.r * .3, b.y - b.r * .3, 1, b.x, b.y, b.r);
-      grd.addColorStop(0, `rgba(6,182,212,${b.alpha * .4})`);
-      grd.addColorStop(1, `rgba(6,182,212,0)`);
-      ctx.beginPath();
-      ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
-      ctx.fillStyle = grd;
-      ctx.fill();
-
-      b.y -= b.speed;
-      b.x += b.drift;
-      if (b.y + b.r < 0) {
-        bubbles.splice(i, 1);
-        spawnBubble();
-      }
-    });
-    requestAnimationFrame(draw);
-  }
-  draw();
-})();
-
-/* ── Scroll fade-in ────────────────────────────────────── */
-const fadeEls = document.querySelectorAll('.fade-up');
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-}, { threshold: 0.12 });
-fadeEls.forEach(el => observer.observe(el));
-
-/* ── Calculator ────────────────────────────────────────── */
-let lastScore = 0, lastGrade = '', lastData = {};
-
+/* ── Scoring rules ─────────────────────────────────────── */
 function getFCRScore(fcr) {
-  if (fcr <= 1.20) return 35;
-  if (fcr <= 1.40) return 25;
-  if (fcr <= 1.60) return 15;
+  if (fcr <= 1.20) return 40;
+  if (fcr <= 1.40) return 28;
+  if (fcr <= 1.60) return 16;
   return 0;
 }
 function getEnergyScore(intensity) {
-  if (intensity <= 2500) return 25;
-  if (intensity <= 3500) return 15;
-  return 5;
-}
-function getSurvivalScore(rate) {
-  if (rate >= 80) return 20;
-  if (rate >= 65) return 12;
-  return 0;
+  if (intensity <= 2500) return 30;
+  if (intensity <= 3500) return 18;
+  return 6;
 }
 function getWaterScore(ratio) {
-  if (ratio <= 1.0) return 20;
-  if (ratio <= 3.0) return 10;
-  return 0;
+  if (ratio <= 80) return 30;
+  if (ratio <= 200) return 18;
+  return 6;
 }
-
 function getGrade(score) {
   if (score >= 80) return { grade: 'A', name: 'Sustainable Farm — Green Passport Eligible', cls: 'grade-a' };
   if (score >= 60) return { grade: 'B', name: 'Standard Farm — Good Standing', cls: 'grade-b' };
-  return { grade: 'C', name: 'High-Risk Farm — Improvement Required', cls: 'grade-c' };
+  return { grade: 'C', name: 'Improvement Needed', cls: 'grade-c' };
 }
 
-function buildTips(fcr, fcrScore, energyIntensity, energyScore, survivalRate, survivalScore, waterRatio, waterScore) {
+let lastScore = 0, lastGrade = '', lastData = {};
+
+/* Finds the % reduction needed to reach the next-better scoring tier, and the points gained. */
+function nextTierGain(value, tiers, currentScore) {
+  for (let i = 0; i < tiers.length; i++) {
+    if (tiers[i].pts > currentScore && value > tiers[i].max) {
+      const pct = Math.ceil(((value - tiers[i].max) / value) * 100);
+      return { pct, gain: tiers[i].pts - currentScore };
+    }
+  }
+  return null;
+}
+
+const FCR_TIERS    = [{ max: 1.20, pts: 40 }, { max: 1.40, pts: 28 }, { max: 1.60, pts: 16 }];
+const ENERGY_TIERS = [{ max: 2500, pts: 30 }, { max: 3500, pts: 18 }];
+const WATER_TIERS  = [{ max: 80,   pts: 30 }, { max: 200,  pts: 18 }];
+
+function buildTips(fcr, fcrScore, energyIntensity, energyScore, waterRatio, waterScore) {
   const tips = [];
-  if (fcrScore < 35) {
-    const saving = fcr > 1.20 ? Math.round((fcr - 1.18) * parseFloat(document.getElementById('inp-yield').value || 0) * 25) : 0;
-    tips.push(`Your FCR is <strong>${fcr.toFixed(2)}</strong> (${fcrScore}/35 pts). Reducing evening feeding by 5% could bring FCR to ≤1.18 and add up to <strong>${saving.toLocaleString()} THB</strong> in savings next cycle.`);
+  if (fcrScore < 40) {
+    const next = nextTierGain(fcr, FCR_TIERS, fcrScore);
+    if (next) tips.push(`Your feed use gives an FCR of <strong>${fcr.toFixed(2)}</strong> (${fcrScore}/40 pts). Reduce feed by ${next.pct}% to gain <strong>+${next.gain} score points!</strong>`);
   }
-  if (energyScore < 25) {
-    tips.push(`Energy intensity is <strong>${Math.round(energyIntensity).toLocaleString()} kWh/Ton</strong> (${energyScore}/25 pts). Consider installing DO sensors and running aerators on-demand rather than fixed schedules to cut energy 10–15%.`);
+  if (energyScore < 30) {
+    const next = nextTierGain(energyIntensity, ENERGY_TIERS, energyScore);
+    if (next) tips.push(`Energy use is <strong>${Math.round(energyIntensity).toLocaleString()} kWh/ton</strong> (${energyScore}/30 pts). Cut electricity by ${next.pct}% (e.g. aerators on-demand) to gain <strong>+${next.gain} score points!</strong>`);
   }
-  if (survivalScore < 20) {
-    tips.push(`Survival rate is <strong>${survivalRate.toFixed(1)}%</strong> (${survivalScore}/20 pts). Improving biosecurity protocols and increasing water exchange frequency during high-temperature weeks can boost survival above 80%.`);
-  }
-  if (waterScore < 20) {
-    tips.push(`Water exchange ratio is <strong>${waterRatio.toFixed(2)}</strong> (${waterScore}/20 pts). Adding a settling pond and recycling discharge water can move you to a semi-closed or closed system, gaining up to 20 points.`);
+  if (waterScore < 30) {
+    const next = nextTierGain(waterRatio, WATER_TIERS, waterScore);
+    if (next) tips.push(`Water changed is <strong>${waterRatio.toFixed(1)} m³/ton</strong> (${waterScore}/30 pts). Reduce water exchange by ${next.pct}% to gain <strong>+${next.gain} score points!</strong>`);
   }
   if (tips.length === 0) {
-    tips.push('Outstanding performance across all KPIs! Maintain your current management practices and consider applying for ASC or BAP certification to maximize export premiums.');
+    tips.push('Excellent! Your farm is efficient across all 3 metrics — you\'re ready to negotiate premium prices with your Green Passport.');
   }
   return tips;
 }
@@ -1492,16 +562,13 @@ function animateGauge(score) {
   const scoreEl = document.getElementById('gauge-score');
   const circumference = 2 * Math.PI * 54;
   const offset = circumference * (1 - score / 100);
-
-  // Color by grade
   if (score >= 80) fill.style.stroke = '#10b981';
   else if (score >= 60) fill.style.stroke = '#f59e0b';
   else fill.style.stroke = '#ef4444';
-
   setTimeout(() => {
     fill.style.strokeDashoffset = offset;
     let cur = 0;
-    const step = Math.ceil(score / 60);
+    const step = Math.ceil(score / 60) || 1;
     const interval = setInterval(() => {
       cur = Math.min(cur + step, score);
       scoreEl.textContent = cur;
@@ -1511,165 +578,157 @@ function animateGauge(score) {
 }
 
 function calculateScore() {
-  const feed    = parseFloat(document.getElementById('inp-feed').value);
-  const yieldKg = parseFloat(document.getElementById('inp-yield').value);
-  const kwh     = parseFloat(document.getElementById('inp-kwh').value);
-  const stocked = parseFloat(document.getElementById('inp-stocked').value);
-  const harv    = parseFloat(document.getElementById('inp-harvested').value);
-  const wOut    = parseFloat(document.getElementById('inp-water-out').value);
-  const pVol    = parseFloat(document.getElementById('inp-pond-vol').value);
+  const feed     = parseFloat(document.getElementById('inp-feed').value);
+  const harvest  = parseFloat(document.getElementById('inp-harvest').value);
+  const electric = parseFloat(document.getElementById('inp-electric').value);
+  const water    = parseFloat(document.getElementById('inp-water').value);
 
-  if ([feed, yieldKg, kwh, stocked, harv, wOut, pVol].some(v => isNaN(v) || v <= 0)) {
-    alert('Please fill in all fields with valid positive numbers.');
+  if ([feed, harvest, electric, water].some(v => isNaN(v) || v <= 0)) {
+    alert('Please fill in all 4 fields with valid positive numbers (or upload a file).');
     return;
   }
 
-  const fcr            = feed / yieldKg;
-  const energyIntensity = kwh / (yieldKg / 1000);
-  const survivalRate   = (harv / stocked) * 100;
-  const waterRatio     = wOut / pVol;
+  const fcr            = feed / harvest;
+  const energyIntensity = electric / (harvest / 1000);
+  const waterRatio      = water / (harvest / 1000);
 
-  const fcrScore      = getFCRScore(fcr);
-  const energyScore   = getEnergyScore(energyIntensity);
-  const survivalScore = getSurvivalScore(survivalRate);
-  const waterScore    = getWaterScore(waterRatio);
-  const totalScore    = fcrScore + energyScore + survivalScore + waterScore;
-  const gradeInfo     = getGrade(totalScore);
+  const fcrScore    = getFCRScore(fcr);
+  const energyScore = getEnergyScore(energyIntensity);
+  const waterScore  = getWaterScore(waterRatio);
+  const totalScore  = fcrScore + energyScore + waterScore;
+  const gradeInfo   = getGrade(totalScore);
 
   lastScore = totalScore;
   lastGrade = gradeInfo.grade;
-  lastData  = { fcr, energyIntensity, survivalRate, waterRatio, fcrScore, energyScore, survivalScore, waterScore };
+  lastData  = { fcr, energyIntensity, waterRatio, fcrScore, energyScore, waterScore };
 
   document.getElementById('calc-empty').style.display = 'none';
   document.getElementById('results-content').style.display = 'block';
 
-  // KPI labels
-  document.getElementById('fcr-val').textContent      = `FCR: ${fcr.toFixed(2)}`;
-  document.getElementById('energy-val').textContent   = `${Math.round(energyIntensity).toLocaleString()} kWh/Ton`;
-  document.getElementById('survival-val').textContent = `${survivalRate.toFixed(1)}%`;
-  document.getElementById('water-val').textContent    = `Ratio: ${waterRatio.toFixed(2)}`;
+  document.getElementById('fcr-val').textContent    = `FCR: ${fcr.toFixed(2)}`;
+  document.getElementById('energy-val').textContent = `${Math.round(energyIntensity).toLocaleString()} kWh/ton`;
+  document.getElementById('water-val').textContent  = `${waterRatio.toFixed(1)} m³/ton`;
 
-  // KPI scores
-  document.getElementById('fcr-score').textContent      = `${fcrScore}/35`;
-  document.getElementById('energy-score').textContent   = `${energyScore}/25`;
-  document.getElementById('survival-score').textContent = `${survivalScore}/20`;
-  document.getElementById('water-score').textContent    = `${waterScore}/20`;
+  document.getElementById('fcr-score').textContent    = `${fcrScore}/40`;
+  document.getElementById('energy-score').textContent = `${energyScore}/30`;
+  document.getElementById('water-score').textContent  = `${waterScore}/30`;
 
-  // Bars
-  animateBar('kpi-fcr',      (fcrScore / 35) * 100);
-  animateBar('kpi-energy',   (energyScore / 25) * 100);
-  animateBar('kpi-survival', (survivalScore / 20) * 100);
-  animateBar('kpi-water',    (waterScore / 20) * 100);
+  animateBar('kpi-fcr',    (fcrScore / 40) * 100);
+  animateBar('kpi-energy', (energyScore / 30) * 100);
+  animateBar('kpi-water',  (waterScore / 30) * 100);
 
-  // Gauge
   animateGauge(totalScore);
 
-  // Grade
-  const gradeDiv    = document.getElementById('grade-display');
+  const gradeDiv = document.getElementById('grade-display');
   gradeDiv.className = `grade-display ${gradeInfo.cls}`;
   document.getElementById('grade-letter').textContent = gradeInfo.grade;
   document.getElementById('grade-name').textContent   = gradeInfo.name;
 
-  // Tips
-  const tips = buildTips(fcr, fcrScore, energyIntensity, energyScore, survivalRate, survivalScore, waterRatio, waterScore);
-  const tipList = document.getElementById('ai-tips');
-  tipList.innerHTML = tips.map(t => `<li>${t}</li>`).join('');
+  const tips = buildTips(fcr, fcrScore, energyIntensity, energyScore, waterRatio, waterScore);
+  document.getElementById('ai-tips').innerHTML = tips.map(t => `<li>${t}</li>`).join('');
 
-  // Passport btn
   const passportBtn = document.getElementById('passport-btn');
-  passportBtn.disabled = totalScore < 60;
   if (totalScore < 60) {
-    passportBtn.textContent = '⛔ Score Too Low for Green Passport (min 60)';
+    passportBtn.disabled = true;
+    passportBtn.textContent = '⛔ Score Too Low for Passport (min 60)';
     passportBtn.style.background = 'rgba(239,68,68,.15)';
     passportBtn.style.color = '#f87171';
     passportBtn.style.boxShadow = 'none';
   } else {
-    passportBtn.innerHTML = '🛂 Generate Digital Green Passport';
+    passportBtn.disabled = false;
+    passportBtn.innerHTML = '🛂 Generate Green Passport';
     passportBtn.style.background = '';
     passportBtn.style.color = '';
     passportBtn.style.boxShadow = '';
-    passportBtn.disabled = false;
   }
+
+  document.getElementById('score').scrollIntoView({ behavior: 'smooth' });
 }
 
-/* ── QR Code Generator (pixel art) ────────────────────── */
+/* ── File upload (Excel/CSV) ────────────────────────────── */
+function findColumnValue(headers, row, keywords) {
+  for (let i = 0; i < headers.length; i++) {
+    const h = String(headers[i] || '').toLowerCase();
+    if (keywords.some(k => h.includes(k))) {
+      const v = parseFloat(row[i]);
+      if (!isNaN(v)) return v;
+    }
+  }
+  return null;
+}
+
+function handleFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  document.getElementById('file-name').textContent = file.name;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const wb = XLSX.read(data, { type: 'array' });
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+      if (rows.length < 2) throw new Error('No data rows found');
+
+      const headers = rows[0];
+      const dataRow = rows[1];
+
+      const feed     = findColumnValue(headers, dataRow, ['feed']);
+      const harvest  = findColumnValue(headers, dataRow, ['harvest', 'yield']);
+      const electric = findColumnValue(headers, dataRow, ['electric', 'kwh', 'power']);
+      const water    = findColumnValue(headers, dataRow, ['water']);
+
+      if (feed !== null)     document.getElementById('inp-feed').value = feed;
+      if (harvest !== null)  document.getElementById('inp-harvest').value = harvest;
+      if (electric !== null) document.getElementById('inp-electric').value = electric;
+      if (water !== null)    document.getElementById('inp-water').value = water;
+
+      if ([feed, harvest, electric, water].some(v => v === null)) {
+        alert('Some columns could not be matched automatically. Please check/fill the numbers manually before calculating.');
+      }
+    } catch (err) {
+      alert('Could not read that file. Please check the format or enter numbers manually.');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+/* ── QR placeholder generator ──────────────────────────── */
 function generateQR(container) {
-  const size = 9;
-  // Fixed pattern that looks like a QR code
   const pattern = [
     [1,1,1,1,1,1,1,0,1],[1,0,0,0,0,0,1,0,0],[1,0,1,1,1,0,1,0,1],
     [1,0,1,1,1,0,1,0,0],[1,0,1,1,1,0,1,0,1],[1,0,0,0,0,0,1,0,1],
     [1,1,1,1,1,1,1,0,1],[0,0,0,0,0,0,0,0,0],[1,0,1,0,1,1,1,0,1],
   ];
   container.innerHTML = '';
-  pattern.forEach(row => {
-    row.forEach(cell => {
-      const div = document.createElement('div');
-      div.className = 'qr-cell';
-      div.style.background = cell ? '#e2e8f0' : 'transparent';
-      container.appendChild(div);
-    });
-  });
+  pattern.forEach(row => row.forEach(cell => {
+    const div = document.createElement('div');
+    div.className = 'qr-cell';
+    div.style.background = cell ? '#1a2333' : 'transparent';
+    container.appendChild(div);
+  }));
 }
 
-/* ── Green Passport Modal ──────────────────────────────── */
+/* ── Green Passport modal ──────────────────────────────── */
 function openPassport() {
   const now = new Date();
-  document.getElementById('pp-date').textContent     = now.toLocaleDateString('en-GB', {day:'2-digit',month:'long',year:'numeric'});
-  document.getElementById('pp-grade').textContent    = `Grade ${lastGrade}`;
-  document.getElementById('pp-score').textContent    = `${lastScore} / 100 points`;
+  const passportId = 'AV-' + now.getFullYear() + '-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+  document.getElementById('pp-date').textContent      = now.toLocaleDateString('en-GB', {day:'2-digit',month:'long',year:'numeric'});
+  document.getElementById('pp-grade').textContent     = `Grade ${lastGrade}`;
+  document.getElementById('pp-score').textContent     = `${lastScore} / 100 points`;
   document.getElementById('pp-score-big').textContent = lastScore;
-  document.getElementById('pp-fcr').textContent      = lastData.fcrScore      + '/35';
-  document.getElementById('pp-energy').textContent   = lastData.energyScore   + '/25';
-  document.getElementById('pp-survival').textContent = lastData.survivalScore + '/20';
-  document.getElementById('pp-water').textContent    = lastData.waterScore    + '/20';
+  document.getElementById('pp-link').textContent      = `https://aqua-ai.app/passport/${passportId}`;
   generateQR(document.getElementById('qr-grid'));
   document.getElementById('passport-modal').classList.add('open');
 }
-
 function closePassport() {
   document.getElementById('passport-modal').classList.remove('open');
 }
-
 document.getElementById('passport-modal').addEventListener('click', function(e) {
   if (e.target === this) closePassport();
 });
-
-/* ── Mobile menu (simple toggle) ──────────────────────── */
-const hamburger = document.getElementById('hamburger');
-hamburger.addEventListener('click', () => {
-  const links = document.querySelector('.nav-links');
-  if (links.style.display === 'flex') {
-    links.style.display = '';
-    links.style.position = '';
-  } else {
-    links.style.cssText = 'display:flex;flex-direction:column;position:absolute;top:70px;left:0;right:0;background:rgba(8,15,30,.97);padding:24px;gap:20px;z-index:99;border-bottom:1px solid var(--border)';
-  }
-});
-
-/* ── Sample data loader ────────────────────────────────── */
-function loadSampleData() {
-  document.getElementById('inp-feed').value       = 5250;
-  document.getElementById('inp-yield').value      = 3800;
-  document.getElementById('inp-kwh').value        = 10500;
-  document.getElementById('inp-stocked').value    = 500000;
-  document.getElementById('inp-harvested').value  = 415000;
-  document.getElementById('inp-water-out').value  = 1800;
-  document.getElementById('inp-pond-vol').value   = 1200;
-}
 </script>
-
-<!-- Sample data helper (subtle) -->
-<div style="position:fixed;bottom:24px;right:24px;z-index:50">
-  <button onclick="loadSampleData()" style="
-    padding:10px 18px;font-size:.8rem;font-weight:600;
-    background:rgba(6,182,212,.15);border:1px solid rgba(6,182,212,.35);
-    color:var(--cyan);border-radius:10px;cursor:pointer;
-    backdrop-filter:blur(10px);transition:all .2s;
-  " onmouseover="this.style.background='rgba(6,182,212,.25)'" onmouseout="this.style.background='rgba(6,182,212,.15)'">
-    📋 Load Sample Data
-  </button>
-</div>
 
 </body>
 </html>
