@@ -514,19 +514,15 @@
 
       <div class="chat-settings" id="chat-settings" style="display:none">
         <p class="chat-settings-note">
-          🔒 This chat calls the AI provider directly from your browser using your own API key.
-          The key is saved only in this browser's local storage and is never sent anywhere except the provider you choose below —
-          don't paste a shared/production key on a public computer.
+          🔒 This chat sends your farm data and messages to the backend server below — your API key lives only on
+          that server (set via environment variable), never in this page or your browser. See <code>server/README.md</code>
+          for how to run it. Point this at your own deployed server before sharing this site publicly.
         </p>
         <div class="chat-settings-row">
-          <select id="chat-provider">
-            <option value="openai">OpenAI · gpt-4o-mini</option>
-            <option value="anthropic">Anthropic · Claude Haiku</option>
-          </select>
-          <input type="password" id="chat-api-key" placeholder="Paste your API key" />
+          <input type="text" id="chat-backend-url" placeholder="e.g. http://localhost:8787/api/chat" />
           <button class="btn-save-key" onclick="saveChatSettings()">Save</button>
         </div>
-        <div class="chat-key-status" id="chat-key-status">✓ API key saved in this browser.</div>
+        <div class="chat-key-status" id="chat-key-status">✓ Backend URL saved in this browser.</div>
       </div>
 
       <div class="chat-window" id="chat-window">
@@ -835,18 +831,17 @@ let chatSystemPrompt = '';
 let chatHistory = [];
 let chatBusy = false;
 
+const DEFAULT_CHAT_BACKEND = 'http://localhost:8787/api/chat';
+
 function loadChatSettings() {
-  const provider = localStorage.getItem('aquaai_chat_provider') || 'openai';
-  const key      = localStorage.getItem('aquaai_chat_key') || '';
-  document.getElementById('chat-provider').value = provider;
-  document.getElementById('chat-api-key').value  = key;
-  document.getElementById('chat-key-status').classList.toggle('show', !!key);
+  const backendUrl = localStorage.getItem('aquaai_chat_backend') || DEFAULT_CHAT_BACKEND;
+  document.getElementById('chat-backend-url').value = backendUrl;
+  document.getElementById('chat-key-status').classList.toggle('show', !!localStorage.getItem('aquaai_chat_backend'));
 }
 
 function getChatSettings() {
   return {
-    provider: localStorage.getItem('aquaai_chat_provider') || 'openai',
-    key: localStorage.getItem('aquaai_chat_key') || '',
+    backendUrl: localStorage.getItem('aquaai_chat_backend') || DEFAULT_CHAT_BACKEND,
   };
 }
 
@@ -856,11 +851,9 @@ function toggleChatSettings() {
 }
 
 function saveChatSettings() {
-  const provider = document.getElementById('chat-provider').value;
-  const key      = document.getElementById('chat-api-key').value.trim();
-  localStorage.setItem('aquaai_chat_provider', provider);
-  localStorage.setItem('aquaai_chat_key', key);
-  document.getElementById('chat-key-status').classList.toggle('show', !!key);
+  const backendUrl = document.getElementById('chat-backend-url').value.trim();
+  localStorage.setItem('aquaai_chat_backend', backendUrl);
+  document.getElementById('chat-key-status').classList.toggle('show', !!backendUrl);
   document.getElementById('chat-settings').style.display = 'none';
 }
 
@@ -950,8 +943,8 @@ function sendChatMessage() {
   if (!text) return;
 
   const settings = getChatSettings();
-  if (!settings.key) {
-    appendChatMessage('bot', '⚠️ Please add your AI API key first — tap the ⚙️ icon above to paste your OpenAI or Anthropic key.');
+  if (!settings.backendUrl) {
+    appendChatMessage('bot', '⚠️ Please set the backend URL first — tap the ⚙️ icon above (see server/README.md for how to run the backend).');
     document.getElementById('chat-settings').style.display = 'block';
     return;
   }
@@ -964,8 +957,8 @@ function sendChatMessage() {
 
 async function requestAssistantReply() {
   const settings = getChatSettings();
-  if (!settings.key) {
-    appendChatMessage('bot', '⚠️ Please add your AI API key first — tap the ⚙️ icon above to paste your OpenAI or Anthropic key.');
+  if (!settings.backendUrl) {
+    appendChatMessage('bot', '⚠️ Please set the backend URL first — tap the ⚙️ icon above (see server/README.md for how to run the backend).');
     document.getElementById('chat-settings').style.display = 'block';
     return;
   }
@@ -975,49 +968,24 @@ async function requestAssistantReply() {
   showTyping();
 
   try {
-    let replyText;
-    if (settings.provider === 'anthropic') {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          'x-api-key': settings.key,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
-        },
-        body: JSON.stringify({
-          model: 'claude-3-5-haiku-20241022',
-          max_tokens: 500,
-          system: chatSystemPrompt,
-          messages: chatHistory,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error?.message || `HTTP ${res.status}`);
-      replyText = data.content?.[0]?.text || '(no response)';
-    } else {
-      const res = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          'Authorization': 'Bearer ' + settings.key,
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          temperature: 0.6,
-          messages: [{ role: 'system', content: chatSystemPrompt }, ...chatHistory],
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error?.message || `HTTP ${res.status}`);
-      replyText = data.choices?.[0]?.message?.content || '(no response)';
-    }
+    const res = await fetch(settings.backendUrl, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        systemPrompt: chatSystemPrompt,
+        messages: chatHistory,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+    const replyText = data.reply || '(no response)';
+
     removeTyping();
     chatHistory.push({ role: 'assistant', content: replyText });
     appendChatMessage('bot', replyText);
   } catch (err) {
     removeTyping();
-    appendChatMessage('bot', `⚠️ Couldn't reach the AI (${err.message}). Check your API key, provider selection, and internet connection.`);
+    appendChatMessage('bot', `⚠️ Couldn't reach the backend (${err.message}). Check the backend URL in ⚙️ settings and make sure the server is running.`);
   } finally {
     chatBusy = false;
     document.getElementById('chat-send-btn').disabled = false;
