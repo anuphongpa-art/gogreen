@@ -910,7 +910,7 @@ let chatSystemPrompt = '';
 let chatHistory = [];
 let chatBusy = false;
 
-const DEFAULT_CHAT_BACKEND = 'http://localhost:8787/api/chat';
+const DEFAULT_CHAT_BACKEND = 'https://gogreen-mwf8.onrender.com/api/chat';
 
 function loadChatSettings() {
   const backendUrl = localStorage.getItem('aquaai_chat_backend') || DEFAULT_CHAT_BACKEND;
