@@ -617,8 +617,8 @@ function getFCRScore(fcr) {
   return 0;
 }
 function getEnergyScore(intensity) {
-  if (intensity <= 2500) return 30;
-  if (intensity <= 3500) return 18;
+  if (intensity <= 3500) return 30;
+  if (intensity <= 5000) return 18;
   return 6;
 }
 function getWaterScore(ratio) {
@@ -646,7 +646,7 @@ function nextTierGain(value, tiers, currentScore) {
 }
 
 const FCR_TIERS    = [{ max: 1.20, pts: 40 }, { max: 1.40, pts: 28 }, { max: 1.60, pts: 16 }];
-const ENERGY_TIERS = [{ max: 2500, pts: 30 }, { max: 3500, pts: 18 }];
+const ENERGY_TIERS = [{ max: 3500, pts: 30 }, { max: 5000, pts: 18 }];
 const WATER_TIERS  = [{ max: 80,   pts: 30 }, { max: 200,  pts: 18 }];
 
 function buildTips(fcr, fcrScore, energyIntensity, energyScore, waterRatio, waterScore) {
@@ -949,7 +949,7 @@ The farmer just calculated their latest Green Score:
 
 Scoring rules (for your reference, don't just recite them):
 FCR: ≤1.20=40pts, 1.21-1.40=28pts, 1.41-1.60=16pts, >1.60=0pts.
-Energy: ≤2500 kWh/ton=30pts, 2501-3500=18pts, >3500=6pts.
+Energy: ≤3500 kWh/ton=30pts, 3501-5000=18pts, >5000=6pts.
 Water: ≤80 m³/ton=30pts, 81-200=18pts, >200=6pts.
 Grade: ≥80=A (Green Passport eligible, min score 60 required to generate one), 60-79=B, <60=C.
 
