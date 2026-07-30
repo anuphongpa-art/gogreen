@@ -361,7 +361,7 @@
   <div class="container">
     <h1 class="hero-title">Turn Farm Data Into a<br><span class="gradient-text">Verified Green Score</span></h1>
     <p class="hero-desc">
-      Upload your harvest sheet or type in 4 numbers. Get an instant Green Score,
+      Upload your harvest sheet or type in 6 numbers. Get an instant Green Score,
       simple AI tips to improve it, and a shareable Green Passport for buyers.
     </p>
     <div class="steps-strip">
@@ -379,14 +379,14 @@
       <div class="badge">1 · Upload Data</div>
       <h2 class="section-title">Bring In Your Harvest Numbers</h2>
       <p class="section-sub center">
-        Upload your existing Excel/CSV sheet, or just type in 4 basic numbers from your last harvest cycle.
+        Upload your existing Excel/CSV sheet, or just type in 6 basic numbers from your last harvest cycle.
       </p>
     </div>
 
     <div class="upload-grid">
       <div class="upload-box card">
         <h3>📄 Upload Excel Sheet</h3>
-        <p class="hint">.xlsx, .xls or .csv — we'll read Feed, Harvest, Electricity & Water columns</p>
+        <p class="hint">.xlsx, .xls or .csv — we'll read Feed, Harvest, Electricity, Water, PL Stocked & Harvested Count columns</p>
         <div class="file-drop" onclick="document.getElementById('file-input').click()">
           <div class="icon">📤</div>
           <div>Click to choose a file</div>
@@ -396,7 +396,7 @@
       </div>
 
       <div class="upload-box card">
-        <h3>✍️ Or Type 4 Numbers</h3>
+        <h3>✍️ Or Type 6 Numbers</h3>
         <p class="hint">From your last harvest cycle summary</p>
         <div style="text-align:left;flex:1">
           <div class="input-group">
@@ -419,6 +419,16 @@
             <input type="number" id="inp-water" placeholder="e.g. 800" min="0" />
             <div class="unit">cubic meters (m³)</div>
           </div>
+          <div class="input-group">
+            <label>PL Stocked (Post-Larvae)</label>
+            <input type="number" id="inp-pl" placeholder="e.g. 500000" min="0" />
+            <div class="unit">pieces</div>
+          </div>
+          <div class="input-group">
+            <label>Shrimp Harvested (Count)</label>
+            <input type="number" id="inp-harvest-count" placeholder="e.g. 400000" min="0" />
+            <div class="unit">pieces</div>
+          </div>
         </div>
       </div>
     </div>
@@ -435,7 +445,7 @@
     <div class="text-center">
       <div class="badge">2 · Auto Green Score</div>
       <h2 class="section-title">Your Farm's Green Score</h2>
-      <p class="section-sub center">Scored automatically from your 4 numbers using standard efficiency rules — low feed waste, low energy use, and low water discharge earn more points.</p>
+      <p class="section-sub center">Scored automatically from your 6 numbers using standard efficiency rules — low feed waste, low energy use, low water discharge, and high survival rate earn more points.</p>
     </div>
 
     <div class="card history-card" id="history-card" style="display:none">
@@ -477,23 +487,30 @@
             <div class="kpi-row">
               <div class="kpi-header">
                 <span class="kpi-name">Feed Efficiency <span style="color:var(--muted);font-size:.75rem" id="fcr-val"></span></span>
-                <span class="kpi-score" id="fcr-score">0/40</span>
+                <span class="kpi-score" id="fcr-score">0/25</span>
               </div>
               <div class="kpi-track"><div class="kpi-bar" id="kpi-fcr" style="background:linear-gradient(90deg,var(--cyan),var(--green))"></div></div>
             </div>
             <div class="kpi-row">
               <div class="kpi-header">
                 <span class="kpi-name">Energy Efficiency <span style="color:var(--muted);font-size:.75rem" id="energy-val"></span></span>
-                <span class="kpi-score" id="energy-score">0/30</span>
+                <span class="kpi-score" id="energy-score">0/25</span>
               </div>
               <div class="kpi-track"><div class="kpi-bar" id="kpi-energy" style="background:linear-gradient(90deg,#f59e0b,#d97706)"></div></div>
             </div>
             <div class="kpi-row">
               <div class="kpi-header">
                 <span class="kpi-name">Water Management <span style="color:var(--muted);font-size:.75rem" id="water-val"></span></span>
-                <span class="kpi-score" id="water-score">0/30</span>
+                <span class="kpi-score" id="water-score">0/25</span>
               </div>
               <div class="kpi-track"><div class="kpi-bar" id="kpi-water" style="background:linear-gradient(90deg,#8b5cf6,#7c3aed)"></div></div>
+            </div>
+            <div class="kpi-row">
+              <div class="kpi-header">
+                <span class="kpi-name">Survival Rate <span style="color:var(--muted);font-size:.75rem" id="survival-val"></span></span>
+                <span class="kpi-score" id="survival-score">0/25</span>
+              </div>
+              <div class="kpi-track"><div class="kpi-bar" id="kpi-survival" style="background:linear-gradient(90deg,#ec4899,#db2777)"></div></div>
             </div>
           </div>
         </div>
@@ -611,20 +628,25 @@
 <script>
 /* ── Scoring rules ─────────────────────────────────────── */
 function getFCRScore(fcr) {
-  if (fcr <= 1.20) return 40;
-  if (fcr <= 1.40) return 28;
-  if (fcr <= 1.60) return 16;
+  if (fcr <= 1.20) return 25;
+  if (fcr <= 1.40) return 18;
+  if (fcr <= 1.60) return 10;
   return 0;
 }
 function getEnergyScore(intensity) {
-  if (intensity <= 2500) return 30;
-  if (intensity <= 3500) return 18;
-  return 6;
+  if (intensity <= 2500) return 25;
+  if (intensity <= 3500) return 15;
+  return 5;
 }
 function getWaterScore(ratio) {
-  if (ratio <= 6000) return 30;
-  if (ratio <= 50000) return 18;
-  return 6;
+  if (ratio <= 6000) return 25;
+  if (ratio <= 50000) return 15;
+  return 5;
+}
+function getSurvivalScore(rate) {
+  if (rate >= 80) return 25;
+  if (rate >= 65) return 15;
+  return 0;
 }
 function getGrade(score) {
   if (score >= 80) return { grade: 'A', name: 'Sustainable Farm — Green Passport Eligible', cls: 'grade-a' };
@@ -645,26 +667,42 @@ function nextTierGain(value, tiers, currentScore) {
   return null;
 }
 
-const FCR_TIERS    = [{ max: 1.20, pts: 40 }, { max: 1.40, pts: 28 }, { max: 1.60, pts: 16 }];
-const ENERGY_TIERS = [{ max: 2500, pts: 30 }, { max: 3500, pts: 18 }];
-const WATER_TIERS  = [{ max: 6000, pts: 30 }, { max: 50000, pts: 18 }];
+/* Same idea as nextTierGain, but for metrics where a HIGHER value is better (e.g. survival rate). */
+function nextTierGainReverse(value, tiers, currentScore) {
+  for (let i = 0; i < tiers.length; i++) {
+    if (tiers[i].pts > currentScore && value < tiers[i].min) {
+      const pct = Math.ceil(((tiers[i].min - value) / value) * 100);
+      return { pct, gain: tiers[i].pts - currentScore };
+    }
+  }
+  return null;
+}
 
-function buildTips(fcr, fcrScore, energyIntensity, energyScore, waterRatio, waterScore) {
+const FCR_TIERS      = [{ max: 1.20, pts: 25 }, { max: 1.40, pts: 18 }, { max: 1.60, pts: 10 }];
+const ENERGY_TIERS   = [{ max: 2500, pts: 25 }, { max: 3500, pts: 15 }];
+const WATER_TIERS    = [{ max: 6000, pts: 25 }, { max: 50000, pts: 15 }];
+const SURVIVAL_TIERS = [{ min: 80,   pts: 25 }, { min: 65,    pts: 15 }];
+
+function buildTips(fcr, fcrScore, energyIntensity, energyScore, waterRatio, waterScore, survivalRate, survivalScore) {
   const tips = [];
-  if (fcrScore < 40) {
+  if (fcrScore < 25) {
     const next = nextTierGain(fcr, FCR_TIERS, fcrScore);
-    if (next) tips.push(`Your feed use gives an FCR of <strong>${fcr.toFixed(2)}</strong> (${fcrScore}/40 pts). Reduce feed by ${next.pct}% to gain <strong>+${next.gain} score points!</strong>`);
+    if (next) tips.push(`Your feed use gives an FCR of <strong>${fcr.toFixed(2)}</strong> (${fcrScore}/25 pts). Reduce feed by ${next.pct}% to gain <strong>+${next.gain} score points!</strong>`);
   }
-  if (energyScore < 30) {
+  if (energyScore < 25) {
     const next = nextTierGain(energyIntensity, ENERGY_TIERS, energyScore);
-    if (next) tips.push(`Energy use is <strong>${Math.round(energyIntensity).toLocaleString()} kWh/ton</strong> (${energyScore}/30 pts). Cut electricity by ${next.pct}% (e.g. aerators on-demand) to gain <strong>+${next.gain} score points!</strong>`);
+    if (next) tips.push(`Energy use is <strong>${Math.round(energyIntensity).toLocaleString()} kWh/ton</strong> (${energyScore}/25 pts). Cut electricity by ${next.pct}% (e.g. aerators on-demand) to gain <strong>+${next.gain} score points!</strong>`);
   }
-  if (waterScore < 30) {
+  if (waterScore < 25) {
     const next = nextTierGain(waterRatio, WATER_TIERS, waterScore);
-    if (next) tips.push(`Water changed is <strong>${waterRatio.toFixed(1)} m³/ton</strong> (${waterScore}/30 pts). Reduce water exchange by ${next.pct}% to gain <strong>+${next.gain} score points!</strong>`);
+    if (next) tips.push(`Water changed is <strong>${waterRatio.toFixed(1)} m³/ton</strong> (${waterScore}/25 pts). Reduce water exchange by ${next.pct}% to gain <strong>+${next.gain} score points!</strong>`);
+  }
+  if (survivalScore < 25) {
+    const next = nextTierGainReverse(survivalRate, SURVIVAL_TIERS, survivalScore);
+    if (next) tips.push(`Survival rate is <strong>${survivalRate.toFixed(1)}%</strong> (${survivalScore}/25 pts). Improving biosecurity and stocking density to raise survival by ${next.pct}% would gain <strong>+${next.gain} score points!</strong>`);
   }
   if (tips.length === 0) {
-    tips.push('Excellent! Your farm is efficient across all 3 metrics — you\'re ready to negotiate premium prices with your Green Passport.');
+    tips.push('Excellent! Your farm is efficient across all 4 metrics — you\'re ready to negotiate premium prices with your Green Passport.');
   }
   return tips;
 }
@@ -749,44 +787,51 @@ function renderScoreHistory() {
 }
 
 function calculateScore() {
-  const feed     = parseFloat(document.getElementById('inp-feed').value);
-  const harvest  = parseFloat(document.getElementById('inp-harvest').value);
-  const electric = parseFloat(document.getElementById('inp-electric').value);
-  const water    = parseFloat(document.getElementById('inp-water').value);
+  const feed          = parseFloat(document.getElementById('inp-feed').value);
+  const harvest       = parseFloat(document.getElementById('inp-harvest').value);
+  const electric      = parseFloat(document.getElementById('inp-electric').value);
+  const water         = parseFloat(document.getElementById('inp-water').value);
+  const pl            = parseFloat(document.getElementById('inp-pl').value);
+  const harvestCount  = parseFloat(document.getElementById('inp-harvest-count').value);
 
-  if ([feed, harvest, electric, water].some(v => isNaN(v) || v <= 0)) {
-    alert('Please fill in all 4 fields with valid positive numbers (or upload a file).');
+  if ([feed, harvest, electric, water, pl, harvestCount].some(v => isNaN(v) || v <= 0)) {
+    alert('Please fill in all 6 fields with valid positive numbers (or upload a file).');
     return;
   }
 
   const fcr            = feed / harvest;
   const energyIntensity = electric / (harvest / 1000);
   const waterRatio      = water / (harvest / 1000);
+  const survivalRate    = (harvestCount / pl) * 100;
 
-  const fcrScore    = getFCRScore(fcr);
-  const energyScore = getEnergyScore(energyIntensity);
-  const waterScore  = getWaterScore(waterRatio);
-  const totalScore  = fcrScore + energyScore + waterScore;
-  const gradeInfo   = getGrade(totalScore);
+  const fcrScore      = getFCRScore(fcr);
+  const energyScore   = getEnergyScore(energyIntensity);
+  const waterScore    = getWaterScore(waterRatio);
+  const survivalScore = getSurvivalScore(survivalRate);
+  const totalScore    = fcrScore + energyScore + waterScore + survivalScore;
+  const gradeInfo     = getGrade(totalScore);
 
   lastScore = totalScore;
   lastGrade = gradeInfo.grade;
-  lastData  = { fcr, energyIntensity, waterRatio, fcrScore, energyScore, waterScore };
+  lastData  = { fcr, energyIntensity, waterRatio, survivalRate, fcrScore, energyScore, waterScore, survivalScore };
 
   document.getElementById('calc-empty').style.display = 'none';
   document.getElementById('results-content').style.display = 'block';
 
-  document.getElementById('fcr-val').textContent    = `FCR: ${fcr.toFixed(2)}`;
-  document.getElementById('energy-val').textContent = `${Math.round(energyIntensity).toLocaleString()} kWh/ton`;
-  document.getElementById('water-val').textContent  = `${waterRatio.toFixed(1)} m³/ton`;
+  document.getElementById('fcr-val').textContent      = `FCR: ${fcr.toFixed(2)}`;
+  document.getElementById('energy-val').textContent   = `${Math.round(energyIntensity).toLocaleString()} kWh/ton`;
+  document.getElementById('water-val').textContent    = `${waterRatio.toFixed(1)} m³/ton`;
+  document.getElementById('survival-val').textContent = `SR: ${survivalRate.toFixed(1)}%`;
 
-  document.getElementById('fcr-score').textContent    = `${fcrScore}/40`;
-  document.getElementById('energy-score').textContent = `${energyScore}/30`;
-  document.getElementById('water-score').textContent  = `${waterScore}/30`;
+  document.getElementById('fcr-score').textContent      = `${fcrScore}/25`;
+  document.getElementById('energy-score').textContent   = `${energyScore}/25`;
+  document.getElementById('water-score').textContent    = `${waterScore}/25`;
+  document.getElementById('survival-score').textContent = `${survivalScore}/25`;
 
-  animateBar('kpi-fcr',    (fcrScore / 40) * 100);
-  animateBar('kpi-energy', (energyScore / 30) * 100);
-  animateBar('kpi-water',  (waterScore / 30) * 100);
+  animateBar('kpi-fcr',      (fcrScore / 25) * 100);
+  animateBar('kpi-energy',   (energyScore / 25) * 100);
+  animateBar('kpi-water',    (waterScore / 25) * 100);
+  animateBar('kpi-survival', (survivalScore / 25) * 100);
 
   animateGauge(totalScore);
 
@@ -795,7 +840,7 @@ function calculateScore() {
   document.getElementById('grade-letter').textContent = gradeInfo.grade;
   document.getElementById('grade-name').textContent   = gradeInfo.name;
 
-  const tips = buildTips(fcr, fcrScore, energyIntensity, energyScore, waterRatio, waterScore);
+  const tips = buildTips(fcr, fcrScore, energyIntensity, energyScore, waterRatio, waterScore, survivalRate, survivalScore);
   document.getElementById('ai-tips').innerHTML = tips.map(t => `<li>${t}</li>`).join('');
 
   const passportBtn = document.getElementById('passport-btn');
@@ -822,9 +867,11 @@ function calculateScore() {
 }
 
 /* ── File upload (Excel/CSV) ────────────────────────────── */
-function findColumnValue(headers, row, keywords) {
+function findColumnValue(headers, row, keywords, excludeKeywords) {
+  excludeKeywords = excludeKeywords || [];
   for (let i = 0; i < headers.length; i++) {
     const h = String(headers[i] || '').toLowerCase();
+    if (excludeKeywords.some(k => h.includes(k))) continue;
     if (keywords.some(k => h.includes(k))) {
       const v = parseFloat(row[i]);
       if (!isNaN(v)) return v;
@@ -850,17 +897,21 @@ function handleFile(event) {
       const headers = rows[0];
       const dataRow = rows[1];
 
-      const feed     = findColumnValue(headers, dataRow, ['feed']);
-      const harvest  = findColumnValue(headers, dataRow, ['harvest', 'yield']);
-      const electric = findColumnValue(headers, dataRow, ['electric', 'kwh', 'power']);
-      const water    = findColumnValue(headers, dataRow, ['water']);
+      const feed          = findColumnValue(headers, dataRow, ['feed']);
+      const electric      = findColumnValue(headers, dataRow, ['electric', 'kwh', 'power']);
+      const water         = findColumnValue(headers, dataRow, ['water']);
+      const pl            = findColumnValue(headers, dataRow, ['pl stocked', 'post-larvae', 'postlarvae', 'stocked']);
+      const harvestCount  = findColumnValue(headers, dataRow, ['count', 'survived', 'population']);
+      const harvest       = findColumnValue(headers, dataRow, ['harvest', 'yield'], ['count', 'survived', 'population']);
 
-      if (feed !== null)     document.getElementById('inp-feed').value = feed;
-      if (harvest !== null)  document.getElementById('inp-harvest').value = harvest;
-      if (electric !== null) document.getElementById('inp-electric').value = electric;
-      if (water !== null)    document.getElementById('inp-water').value = water;
+      if (feed !== null)         document.getElementById('inp-feed').value = feed;
+      if (harvest !== null)      document.getElementById('inp-harvest').value = harvest;
+      if (electric !== null)     document.getElementById('inp-electric').value = electric;
+      if (water !== null)        document.getElementById('inp-water').value = water;
+      if (pl !== null)           document.getElementById('inp-pl').value = pl;
+      if (harvestCount !== null) document.getElementById('inp-harvest-count').value = harvestCount;
 
-      if ([feed, harvest, electric, water].some(v => v === null)) {
+      if ([feed, harvest, electric, water, pl, harvestCount].some(v => v === null)) {
         alert('Some columns could not be matched automatically. Please check/fill the numbers manually before calculating.');
       }
     } catch (err) {
@@ -943,20 +994,22 @@ function buildChatSystemPrompt(tips) {
 
 The farmer just calculated their latest Green Score:
 - Total Score: ${lastScore}/100 (Grade ${lastGrade})
-- Feed Efficiency (FCR = feed ÷ harvest): ${d.fcr.toFixed(2)} → ${d.fcrScore}/40 pts
-- Energy Efficiency: ${Math.round(d.energyIntensity).toLocaleString()} kWh/ton harvested → ${d.energyScore}/30 pts
-- Water Management: ${d.waterRatio.toFixed(1)} m³ water changed per ton harvested → ${d.waterScore}/30 pts
+- Feed Efficiency (FCR = feed ÷ harvest): ${d.fcr.toFixed(2)} → ${d.fcrScore}/25 pts
+- Energy Efficiency: ${Math.round(d.energyIntensity).toLocaleString()} kWh/ton harvested → ${d.energyScore}/25 pts
+- Water Management: ${d.waterRatio.toFixed(1)} m³ water changed per ton harvested → ${d.waterScore}/25 pts
+- Survival Rate (harvested count ÷ PL stocked): ${d.survivalRate.toFixed(1)}% → ${d.survivalScore}/25 pts
 
 Scoring rules (for your reference, don't just recite them):
-FCR: ≤1.20=40pts, 1.21-1.40=28pts, 1.41-1.60=16pts, >1.60=0pts.
-Energy: ≤2500 kWh/ton=30pts, 2501-3500=18pts, >3500=6pts.
-Water: ≤6000 m³/ton=30pts, 6001-50000=18pts, >50000=6pts.
+FCR: ≤1.20=25pts, 1.21-1.40=18pts, 1.41-1.60=10pts, >1.60=0pts.
+Energy: ≤2500 kWh/ton=25pts, 2501-3500=15pts, >3500=5pts.
+Water: ≤6000 m³/ton=25pts, 6001-50000=15pts, >50000=5pts.
+Survival Rate: ≥80%=25pts, 65-79%=15pts, <65%=0pts.
 Grade: ≥80=A (Green Passport eligible, min score 60 required to generate one), 60-79=B, <60=C.
 
 Auto-generated tips already shown to the farmer:
 ${tipsText || '(none — farm is already efficient across all metrics)'}
 
-Your job: give a short, encouraging initial assessment (a few sentences) that references their actual numbers, then be ready to answer follow-up questions about how to improve feed, energy, or water management, what the Green Passport is for, or how their numbers compare to the thresholds. Keep replies concise (under 120 words) unless asked for more detail. Reply in whatever language the farmer writes in (support Thai and English equally well). If asked about something unrelated to farm sustainability/scoring, politely steer the conversation back.`;
+Your job: give a short, encouraging initial assessment (a few sentences) that references their actual numbers, then be ready to answer follow-up questions about how to improve feed, energy, water management, or survival rate/biosecurity, what the Green Passport is for, or how their numbers compare to the thresholds. Keep replies concise (under 120 words) unless asked for more detail. Reply in whatever language the farmer writes in (support Thai and English equally well). If asked about something unrelated to farm sustainability/scoring, politely steer the conversation back.`;
 }
 
 function primeChatbot(tips) {
