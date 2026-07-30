@@ -487,28 +487,28 @@
             <div class="kpi-row">
               <div class="kpi-header">
                 <span class="kpi-name">Feed Efficiency <span style="color:var(--muted);font-size:.75rem" id="fcr-val"></span></span>
-                <span class="kpi-score" id="fcr-score">0/32</span>
+                <span class="kpi-score" id="fcr-score">0/25</span>
               </div>
               <div class="kpi-track"><div class="kpi-bar" id="kpi-fcr" style="background:linear-gradient(90deg,var(--cyan),var(--green))"></div></div>
             </div>
             <div class="kpi-row">
               <div class="kpi-header">
                 <span class="kpi-name">Energy Efficiency <span style="color:var(--muted);font-size:.75rem" id="energy-val"></span></span>
-                <span class="kpi-score" id="energy-score">0/24</span>
+                <span class="kpi-score" id="energy-score">0/25</span>
               </div>
               <div class="kpi-track"><div class="kpi-bar" id="kpi-energy" style="background:linear-gradient(90deg,#f59e0b,#d97706)"></div></div>
             </div>
             <div class="kpi-row">
               <div class="kpi-header">
                 <span class="kpi-name">Water Management <span style="color:var(--muted);font-size:.75rem" id="water-val"></span></span>
-                <span class="kpi-score" id="water-score">0/24</span>
+                <span class="kpi-score" id="water-score">0/25</span>
               </div>
               <div class="kpi-track"><div class="kpi-bar" id="kpi-water" style="background:linear-gradient(90deg,#8b5cf6,#7c3aed)"></div></div>
             </div>
             <div class="kpi-row">
               <div class="kpi-header">
                 <span class="kpi-name">Survival Rate <span style="color:var(--muted);font-size:.75rem" id="survival-val"></span></span>
-                <span class="kpi-score" id="survival-score">0/20</span>
+                <span class="kpi-score" id="survival-score">0/25</span>
               </div>
               <div class="kpi-track"><div class="kpi-bar" id="kpi-survival" style="background:linear-gradient(90deg,#ec4899,#db2777)"></div></div>
             </div>
@@ -628,24 +628,24 @@
 <script>
 /* ── Scoring rules ─────────────────────────────────────── */
 function getFCRScore(fcr) {
-  if (fcr <= 1.20) return 32;
-  if (fcr <= 1.40) return 22;
-  if (fcr <= 1.60) return 13;
+  if (fcr <= 1.20) return 25;
+  if (fcr <= 1.40) return 18;
+  if (fcr <= 1.60) return 10;
   return 0;
 }
 function getEnergyScore(intensity) {
-  if (intensity <= 2500) return 24;
-  if (intensity <= 3500) return 14;
+  if (intensity <= 2500) return 25;
+  if (intensity <= 3500) return 15;
   return 5;
 }
 function getWaterScore(ratio) {
-  if (ratio <= 6000) return 24;
-  if (ratio <= 50000) return 14;
+  if (ratio <= 6000) return 25;
+  if (ratio <= 50000) return 15;
   return 5;
 }
 function getSurvivalScore(rate) {
-  if (rate >= 80) return 20;
-  if (rate >= 65) return 12;
+  if (rate >= 80) return 25;
+  if (rate >= 65) return 15;
   return 0;
 }
 function getGrade(score) {
@@ -678,28 +678,28 @@ function nextTierGainReverse(value, tiers, currentScore) {
   return null;
 }
 
-const FCR_TIERS      = [{ max: 1.20, pts: 32 }, { max: 1.40, pts: 22 }, { max: 1.60, pts: 13 }];
-const ENERGY_TIERS   = [{ max: 2500, pts: 24 }, { max: 3500, pts: 14 }];
-const WATER_TIERS    = [{ max: 6000, pts: 24 }, { max: 50000, pts: 14 }];
-const SURVIVAL_TIERS = [{ min: 80,   pts: 20 }, { min: 65,    pts: 12 }];
+const FCR_TIERS      = [{ max: 1.20, pts: 25 }, { max: 1.40, pts: 18 }, { max: 1.60, pts: 10 }];
+const ENERGY_TIERS   = [{ max: 2500, pts: 25 }, { max: 3500, pts: 15 }];
+const WATER_TIERS    = [{ max: 6000, pts: 25 }, { max: 50000, pts: 15 }];
+const SURVIVAL_TIERS = [{ min: 80,   pts: 25 }, { min: 65,    pts: 15 }];
 
 function buildTips(fcr, fcrScore, energyIntensity, energyScore, waterRatio, waterScore, survivalRate, survivalScore) {
   const tips = [];
-  if (fcrScore < 32) {
+  if (fcrScore < 25) {
     const next = nextTierGain(fcr, FCR_TIERS, fcrScore);
-    if (next) tips.push(`Your feed use gives an FCR of <strong>${fcr.toFixed(2)}</strong> (${fcrScore}/32 pts). Reduce feed by ${next.pct}% to gain <strong>+${next.gain} score points!</strong>`);
+    if (next) tips.push(`Your feed use gives an FCR of <strong>${fcr.toFixed(2)}</strong> (${fcrScore}/25 pts). Reduce feed by ${next.pct}% to gain <strong>+${next.gain} score points!</strong>`);
   }
-  if (energyScore < 24) {
+  if (energyScore < 25) {
     const next = nextTierGain(energyIntensity, ENERGY_TIERS, energyScore);
-    if (next) tips.push(`Energy use is <strong>${Math.round(energyIntensity).toLocaleString()} kWh/ton</strong> (${energyScore}/24 pts). Cut electricity by ${next.pct}% (e.g. aerators on-demand) to gain <strong>+${next.gain} score points!</strong>`);
+    if (next) tips.push(`Energy use is <strong>${Math.round(energyIntensity).toLocaleString()} kWh/ton</strong> (${energyScore}/25 pts). Cut electricity by ${next.pct}% (e.g. aerators on-demand) to gain <strong>+${next.gain} score points!</strong>`);
   }
-  if (waterScore < 24) {
+  if (waterScore < 25) {
     const next = nextTierGain(waterRatio, WATER_TIERS, waterScore);
-    if (next) tips.push(`Water changed is <strong>${waterRatio.toFixed(1)} m³/ton</strong> (${waterScore}/24 pts). Reduce water exchange by ${next.pct}% to gain <strong>+${next.gain} score points!</strong>`);
+    if (next) tips.push(`Water changed is <strong>${waterRatio.toFixed(1)} m³/ton</strong> (${waterScore}/25 pts). Reduce water exchange by ${next.pct}% to gain <strong>+${next.gain} score points!</strong>`);
   }
-  if (survivalScore < 20) {
+  if (survivalScore < 25) {
     const next = nextTierGainReverse(survivalRate, SURVIVAL_TIERS, survivalScore);
-    if (next) tips.push(`Survival rate is <strong>${survivalRate.toFixed(1)}%</strong> (${survivalScore}/20 pts). Improving biosecurity and stocking density to raise survival by ${next.pct}% would gain <strong>+${next.gain} score points!</strong>`);
+    if (next) tips.push(`Survival rate is <strong>${survivalRate.toFixed(1)}%</strong> (${survivalScore}/25 pts). Improving biosecurity and stocking density to raise survival by ${next.pct}% would gain <strong>+${next.gain} score points!</strong>`);
   }
   if (tips.length === 0) {
     tips.push('Excellent! Your farm is efficient across all 4 metrics — you\'re ready to negotiate premium prices with your Green Passport.');
@@ -823,15 +823,15 @@ function calculateScore() {
   document.getElementById('water-val').textContent    = `${waterRatio.toFixed(1)} m³/ton`;
   document.getElementById('survival-val').textContent = `SR: ${survivalRate.toFixed(1)}%`;
 
-  document.getElementById('fcr-score').textContent      = `${fcrScore}/32`;
-  document.getElementById('energy-score').textContent   = `${energyScore}/24`;
-  document.getElementById('water-score').textContent    = `${waterScore}/24`;
-  document.getElementById('survival-score').textContent = `${survivalScore}/20`;
+  document.getElementById('fcr-score').textContent      = `${fcrScore}/25`;
+  document.getElementById('energy-score').textContent   = `${energyScore}/25`;
+  document.getElementById('water-score').textContent    = `${waterScore}/25`;
+  document.getElementById('survival-score').textContent = `${survivalScore}/25`;
 
-  animateBar('kpi-fcr',      (fcrScore / 32) * 100);
-  animateBar('kpi-energy',   (energyScore / 24) * 100);
-  animateBar('kpi-water',    (waterScore / 24) * 100);
-  animateBar('kpi-survival', (survivalScore / 20) * 100);
+  animateBar('kpi-fcr',      (fcrScore / 25) * 100);
+  animateBar('kpi-energy',   (energyScore / 25) * 100);
+  animateBar('kpi-water',    (waterScore / 25) * 100);
+  animateBar('kpi-survival', (survivalScore / 25) * 100);
 
   animateGauge(totalScore);
 
@@ -994,16 +994,16 @@ function buildChatSystemPrompt(tips) {
 
 The farmer just calculated their latest Green Score:
 - Total Score: ${lastScore}/100 (Grade ${lastGrade})
-- Feed Efficiency (FCR = feed ÷ harvest): ${d.fcr.toFixed(2)} → ${d.fcrScore}/32 pts
-- Energy Efficiency: ${Math.round(d.energyIntensity).toLocaleString()} kWh/ton harvested → ${d.energyScore}/24 pts
-- Water Management: ${d.waterRatio.toFixed(1)} m³ water changed per ton harvested → ${d.waterScore}/24 pts
-- Survival Rate (harvested count ÷ PL stocked): ${d.survivalRate.toFixed(1)}% → ${d.survivalScore}/20 pts
+- Feed Efficiency (FCR = feed ÷ harvest): ${d.fcr.toFixed(2)} → ${d.fcrScore}/25 pts
+- Energy Efficiency: ${Math.round(d.energyIntensity).toLocaleString()} kWh/ton harvested → ${d.energyScore}/25 pts
+- Water Management: ${d.waterRatio.toFixed(1)} m³ water changed per ton harvested → ${d.waterScore}/25 pts
+- Survival Rate (harvested count ÷ PL stocked): ${d.survivalRate.toFixed(1)}% → ${d.survivalScore}/25 pts
 
 Scoring rules (for your reference, don't just recite them):
-FCR: ≤1.20=32pts, 1.21-1.40=22pts, 1.41-1.60=13pts, >1.60=0pts.
-Energy: ≤2500 kWh/ton=24pts, 2501-3500=14pts, >3500=5pts.
-Water: ≤6000 m³/ton=24pts, 6001-50000=14pts, >50000=5pts.
-Survival Rate: ≥80%=20pts, 65-79%=12pts, <65%=0pts.
+FCR: ≤1.20=25pts, 1.21-1.40=18pts, 1.41-1.60=10pts, >1.60=0pts.
+Energy: ≤2500 kWh/ton=25pts, 2501-3500=15pts, >3500=5pts.
+Water: ≤6000 m³/ton=25pts, 6001-50000=15pts, >50000=5pts.
+Survival Rate: ≥80%=25pts, 65-79%=15pts, <65%=0pts.
 Grade: ≥80=A (Green Passport eligible, min score 60 required to generate one), 60-79=B, <60=C.
 
 Auto-generated tips already shown to the farmer:
